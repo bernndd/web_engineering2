@@ -26,7 +26,7 @@ jobs:
     
           
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build ./src/Org.OpenAPITools/ --file Dockerfile --tag my-image-name:$(date +%s)
       
       
   push_to_registry:
