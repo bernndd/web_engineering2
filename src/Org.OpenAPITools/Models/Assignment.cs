@@ -17,9 +17,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Org.OpenAPITools.Converters;
+using Microsoft.EntityFrameworkCore;
 
 namespace Org.OpenAPITools.Models
-{ 
+{
+
     /// <summary>
     /// the assignment between an employee and a reservation with its role. An assignment must only exist once per reservation and role. 
     /// </summary>
