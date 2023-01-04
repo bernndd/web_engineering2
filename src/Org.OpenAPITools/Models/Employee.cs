@@ -31,7 +31,7 @@ namespace Org.OpenAPITools.Models
         /// </summary>
         /// <value>the id of the employee</value>
         [DataMember(Name="id", EmitDefaultValue=false)]
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
 
         /// <summary>
         /// the name of the employee
@@ -39,7 +39,7 @@ namespace Org.OpenAPITools.Models
         /// <value>the name of the employee</value>
         [Required]
         [DataMember(Name="name", EmitDefaultValue=false)]
-        public string Name { get; set; }
+        public string name { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -49,8 +49,8 @@ namespace Org.OpenAPITools.Models
         {
             var sb = new StringBuilder();
             sb.Append("class Employee {\n");
-            sb.Append("  Id: ").Append(Id).Append("\n");
-            sb.Append("  Name: ").Append(Name).Append("\n");
+            sb.Append("  id: ").Append(id).Append("\n");
+            sb.Append("  name: ").Append(name).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -88,14 +88,14 @@ namespace Org.OpenAPITools.Models
 
             return 
                 (
-                    Id == other.Id ||
-                    Id != null &&
-                    Id.Equals(other.Id)
+                    id == other.id ||
+                    id != null &&
+                    id.Equals(other.id)
                 ) && 
                 (
-                    Name == other.Name ||
-                    Name != null &&
-                    Name.Equals(other.Name)
+                    name == other.name ||
+                    name != null &&
+                    name.Equals(other.name)
                 );
         }
 
@@ -109,10 +109,10 @@ namespace Org.OpenAPITools.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (Id != null)
-                    hashCode = hashCode * 59 + Id.GetHashCode();
-                    if (Name != null)
-                    hashCode = hashCode * 59 + Name.GetHashCode();
+                    if (id != null)
+                    hashCode = hashCode * 59 + id.GetHashCode();
+                    if (name != null)
+                    hashCode = hashCode * 59 + name.GetHashCode();
                 return hashCode;
             }
         }

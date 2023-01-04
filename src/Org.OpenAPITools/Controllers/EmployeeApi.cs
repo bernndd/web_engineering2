@@ -25,13 +25,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Query.ExpressionTranslators.Internal
 using personal.Helpers;
 
 namespace Org.OpenAPITools.Controllers
-{ 
+{
     /// <summary>
     /// 
     /// </summary>
     [ApiController]
     public class EmployeeApiController : ControllerBase
-    { 
+    {
         private readonly DatabaseContext databaseContext;
 
         public EmployeeApiController(DatabaseContext dbContext)
@@ -55,12 +55,16 @@ namespace Org.OpenAPITools.Controllers
             // return StatusCode(200, default(PersonalEmployeesGet200Response));
             string exampleJson = null;
             exampleJson = "{\n  \"employees\" : [ {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  }, {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  } ]\n}";
-            
+
             var example = exampleJson != null
             ? JsonConvert.DeserializeObject<PersonalEmployeesGet200Response>(exampleJson)
             : default(PersonalEmployeesGet200Response);
             //TODO: Change the data returned
-            return new ObjectResult(example);
+            //return new ObjectResult(example);
+
+            var employees = databaseContext.employees;
+            return new JsonResult(employees);
+         
         }
 
         /// <summary>
@@ -78,7 +82,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "deletion not possible because of existing assignments")]
-        public virtual IActionResult PersonalEmployeesIdDelete([FromRoute (Name = "id")][Required]Guid id)
+        public virtual IActionResult PersonalEmployeesIdDelete([FromRoute(Name = "id")][Required] Guid id)
         {
 
             //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
@@ -105,7 +109,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerOperation("PersonalEmployeesIdGet")]
         [SwaggerResponse(statusCode: 200, type: typeof(Employee), description: "successful operation")]
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
-        public virtual IActionResult PersonalEmployeesIdGet([FromRoute (Name = "id")][Required]Guid id)
+        public virtual IActionResult PersonalEmployeesIdGet([FromRoute(Name = "id")][Required] Guid id)
         {
 
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
@@ -114,7 +118,7 @@ namespace Org.OpenAPITools.Controllers
             // return StatusCode(404, default(Error));
             string exampleJson = null;
             exampleJson = "{\n  \"name\" : \"Max Specimeno\",\n  \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n}";
-            
+
             var example = exampleJson != null
             ? JsonConvert.DeserializeObject<Employee>(exampleJson)
             : default(Employee);
@@ -140,7 +144,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(Error), description: "invalid input")]
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "mismatching id in url and object")]
-        public virtual IActionResult PersonalEmployeesIdPut([FromRoute (Name = "id")][Required]Guid id, [FromBody]Employee employee)
+        public virtual IActionResult PersonalEmployeesIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Employee employee)
         {
 
             //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
@@ -173,9 +177,9 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 201, type: typeof(Employee), description: "successful operation of creating a new employee")]
         [SwaggerResponse(statusCode: 400, type: typeof(Error), description: "invalid input")]
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
-        public virtual IActionResult PersonalEmployeesPost([FromBody]Employee employee)
+        public virtual IActionResult PersonalEmployeesPost([FromBody] Employee employee)
         {
-            databaseContext.Employees.Add(employee);
+            databaseContext.employees.Add(employee);
             databaseContext.SaveChanges();
             //Validate Fehlgeschlagen --> 401
             //TODO: http://${KEYCLOAK_HOST}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
@@ -191,7 +195,7 @@ namespace Org.OpenAPITools.Controllers
             // return StatusCode(401, default(Error));
             string exampleJson = null;
             exampleJson = "{\n  \"name\" : \"Max Specimeno\",\n  \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n}";
-            
+
             var example = exampleJson != null
             ? JsonConvert.DeserializeObject<Employee>(exampleJson)
             : default(Employee);

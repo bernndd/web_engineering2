@@ -28,11 +28,13 @@ namespace Org.OpenAPITools.Models
     [DataContract]
     public partial class Assignment : IEquatable<Assignment>
     {
+
+
         /// <summary>
         /// the id of the assignment
         /// </summary>
         /// <value>the id of the assignment</value>
-        [DataMember(Name="id", EmitDefaultValue=false)]
+        [DataMember(Name = "id", EmitDefaultValue = false)]
         public Guid Id { get; set; }
 
         /// <summary>
@@ -40,7 +42,7 @@ namespace Org.OpenAPITools.Models
         /// </summary>
         /// <value>the id of the employee this assignment references</value>
         [Required]
-        [DataMember(Name="employee_id", EmitDefaultValue=false)]
+        [DataMember(Name = "employee_id", EmitDefaultValue = false)]
         public Guid EmployeeId { get; set; }
 
         /// <summary>
@@ -48,7 +50,7 @@ namespace Org.OpenAPITools.Models
         /// </summary>
         /// <value>the id of the reservation this assignment references</value>
         [Required]
-        [DataMember(Name="reservation_id", EmitDefaultValue=false)]
+        [DataMember(Name = "reservation_id", EmitDefaultValue = false)]
         public Guid ReservationId { get; set; }
 
 
@@ -60,13 +62,13 @@ namespace Org.OpenAPITools.Models
         [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public enum RoleEnum
         {
-            
+
             /// <summary>
             /// Enum ServiceEnum for service
             /// </summary>
             [EnumMember(Value = "service")]
             ServiceEnum = 1,
-            
+
             /// <summary>
             /// Enum CleanupEnum for cleanup
             /// </summary>
@@ -79,8 +81,9 @@ namespace Org.OpenAPITools.Models
         /// </summary>
         /// <value>the role which the employee impersonates in this assignment</value>
         [Required]
-        [DataMember(Name="role", EmitDefaultValue=true)]
+        [DataMember(Name = "role", EmitDefaultValue = true)]
         public RoleEnum Role { get; set; }
+
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -129,25 +132,25 @@ namespace Org.OpenAPITools.Models
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return 
+            return
                 (
                     Id == other.Id ||
                     Id != null &&
                     Id.Equals(other.Id)
-                ) && 
+                ) &&
                 (
                     EmployeeId == other.EmployeeId ||
                     EmployeeId != null &&
                     EmployeeId.Equals(other.EmployeeId)
-                ) && 
+                ) &&
                 (
                     ReservationId == other.ReservationId ||
                     ReservationId != null &&
                     ReservationId.Equals(other.ReservationId)
-                ) && 
+                ) &&
                 (
                     Role == other.Role ||
-                    
+
                     Role.Equals(other.Role)
                 );
         }
@@ -162,20 +165,20 @@ namespace Org.OpenAPITools.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (Id != null)
+                if (Id != null)
                     hashCode = hashCode * 59 + Id.GetHashCode();
-                    if (EmployeeId != null)
+                if (EmployeeId != null)
                     hashCode = hashCode * 59 + EmployeeId.GetHashCode();
-                    if (ReservationId != null)
+                if (ReservationId != null)
                     hashCode = hashCode * 59 + ReservationId.GetHashCode();
-                    
-                    hashCode = hashCode * 59 + Role.GetHashCode();
+
+                hashCode = hashCode * 59 + Role.GetHashCode();
                 return hashCode;
             }
         }
 
         #region Operators
-        #pragma warning disable 1591
+#pragma warning disable 1591
 
         public static bool operator ==(Assignment left, Assignment right)
         {
@@ -187,7 +190,7 @@ namespace Org.OpenAPITools.Models
             return !Equals(left, right);
         }
 
-        #pragma warning restore 1591
+#pragma warning restore 1591
         #endregion Operators
     }
 }

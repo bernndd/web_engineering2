@@ -26,6 +26,7 @@ using Org.OpenAPITools.OpenApi;
 using Org.OpenAPITools.Formatters;
 using personal.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Org.OpenAPITools.Models;
 
 namespace Org.OpenAPITools
 {
@@ -69,7 +70,7 @@ namespace Org.OpenAPITools
                         NamingStrategy = new CamelCaseNamingStrategy()
                     });
                 });
-            services.AddDbContext<DatabaseContext>( options =>
+            services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>( options =>
             {
                 options.UseNpgsql(Configuration.GetConnectionString("WebApiDatabase"));
             });

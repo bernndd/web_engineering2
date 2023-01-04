@@ -27,7 +27,13 @@ namespace Org.OpenAPITools.Controllers
     /// </summary>
     [ApiController]
     public class AssignmentApiController : ControllerBase
-    { 
+    {
+        private readonly DatabaseContext databaseContext;
+
+        public AssignmentApiController(DatabaseContext dbContext)
+        {
+            databaseContext = dbContext;
+        }
         /// <summary>
         /// get all personal assignments
         /// </summary>
