@@ -4,8 +4,8 @@
     "windowsAuthentication": false, 
     "anonymousAuthentication": true, 
     "iisExpress": {
-      "applicationUrl": "http://localhost:61788",
-      "sslPort": 44301
+      "applicationUrl": "http://localhost:8000"
+   
     }
   },
   "profiles": {
@@ -31,7 +31,7 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/openapi",
       "publishAllPorts": true,
-      "useSSL": true
+      "useSSL": false
     }
   }
 }

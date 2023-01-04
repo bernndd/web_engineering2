@@ -1,0 +1,80 @@
+name: Docker Image CI
+
+on:
+  release:
+    types: [published]
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
+  pull_request:
+    branches: [ "master" ]
+    tags:
+      - 'v*'
+
+env:
+    REGISTRY: ghcr.io
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+          
+    - name: Build the Docker image
+      run: docker build ./src/Org.OpenAPITools/ --file Dockerfile --tag my-image-name:$(date +%s)
+      
+      
+  push_to_registry:
+    permissions:
+      packages: write
+      contents: read
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v3
+      
+    - name: Login to Github Package Registry
+      uses: docker/login-action@v2.1.0
+      with:
+          # Server address of Docker registry. If not set then will default to Docker Hub
+        registry: ${{ env.REGISTRY }}
+          # Username used to log against the Docker registry
+        username: ${{ github.actor }}
+          # Password or personal access token used to log against the Docker registry
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+        
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v4.1.1
+      with:
+        images: |
+            ghcr.io/bernndd/WebEngineering2
+        tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=sha
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v3.2.0
+      with:
+        context: .
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+   
+      
+      
