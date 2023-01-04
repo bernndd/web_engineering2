@@ -24,6 +24,8 @@ using Org.OpenAPITools.Authentication;
 using Org.OpenAPITools.Filters;
 using Org.OpenAPITools.OpenApi;
 using Org.OpenAPITools.Formatters;
+using personal.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Org.OpenAPITools
 {
@@ -67,6 +69,10 @@ namespace Org.OpenAPITools
                         NamingStrategy = new CamelCaseNamingStrategy()
                     });
                 });
+            services.AddDbContext<DatabaseContext>( options =>
+            {
+                options.UseNpgsql(Configuration.GetConnectionString("WebApiDatabase"));
+            });
 
             services
                 .AddSwaggerGen(c =>
@@ -102,6 +108,7 @@ namespace Org.OpenAPITools
                 });
                 services
                     .AddSwaggerGenNewtonsoftSupport();
+
         }
 
         /// <summary>
@@ -119,6 +126,7 @@ namespace Org.OpenAPITools
             {
                 app.UseHsts();
             }
+
 
             app.UseHttpsRedirection();
             app.UseDefaultFiles();

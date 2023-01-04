@@ -19,6 +19,10 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Newtonsoft.Json;
 using Org.OpenAPITools.Attributes;
 using Org.OpenAPITools.Models;
+using Microsoft.AspNetCore.Connections;
+using System.Net.Http;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.ExpressionTranslators.Internal;
+using personal.Helpers;
 
 namespace Org.OpenAPITools.Controllers
 { 
@@ -28,12 +32,19 @@ namespace Org.OpenAPITools.Controllers
     [ApiController]
     public class EmployeeApiController : ControllerBase
     { 
+        private readonly DatabaseContext databaseContext;
+
+        public EmployeeApiController(DatabaseContext dbContext)
+        {
+            databaseContext = dbContext;
+        }
+
         /// <summary>
         /// get all employees
         /// </summary>
         /// <response code="200">successful operation</response>
         [HttpGet]
-        [Route("/api/personal/employees/")]
+        [Route("/personal/employees/")]
         [ValidateModelState]
         [SwaggerOperation("PersonalEmployeesGet")]
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalEmployeesGet200Response), description: "successful operation")]
@@ -61,7 +72,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="404">not found</response>
         /// <response code="422">deletion not possible because of existing assignments</response>
         [HttpDelete]
-        [Route("/api/personal/employees/{id}/")]
+        [Route("/personal/employees/{id}/")]
         [ValidateModelState]
         [SwaggerOperation("PersonalEmployeesIdDelete")]
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
@@ -89,7 +100,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="200">successful operation</response>
         /// <response code="404">not found</response>
         [HttpGet]
-        [Route("/api/personal/employees/{id}/")]
+        [Route("/personal/employees/{id}/")]
         [ValidateModelState]
         [SwaggerOperation("PersonalEmployeesIdGet")]
         [SwaggerResponse(statusCode: 200, type: typeof(Employee), description: "successful operation")]
@@ -122,7 +133,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="401">if no (valid) authentication is given</response>
         /// <response code="422">mismatching id in url and object</response>
         [HttpPut]
-        [Route("/api/personal/employees/{id}/")]
+        [Route("/personal/employees/{id}/")]
         [Consumes("application/json")]
         [ValidateModelState]
         [SwaggerOperation("PersonalEmployeesIdPut")]
@@ -154,7 +165,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="400">invalid input</response>
         /// <response code="401">if no (valid) authentication is given</response>
         [HttpPost]
-        [Route("/api/personal/employees/")]
+        [Route("/personal/employees/")]
         [Consumes("application/json")]
         [ValidateModelState]
         [SwaggerOperation("PersonalEmployeesPost")]
@@ -164,6 +175,11 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         public virtual IActionResult PersonalEmployeesPost([FromBody]Employee employee)
         {
+            databaseContext.Employees.Add(employee);
+            databaseContext.SaveChanges();
+            //Validate Fehlgeschlagen --> 401
+            //TODO: http://${KEYCLOAK_HOST}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+
 
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(Employee));

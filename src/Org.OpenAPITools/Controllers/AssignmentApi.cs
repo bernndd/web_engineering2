@@ -34,7 +34,7 @@ namespace Org.OpenAPITools.Controllers
         /// <param name="employeeId">filter for a given employee</param>
         /// <response code="200">successful operation</response>
         [HttpGet]
-        [Route("/api/personal/assignments/")]
+        [Route("/personal/assignments/")]
         [ValidateModelState]
         [SwaggerOperation("PersonalAssignmentsGet")]
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalAssignmentsGet200Response), description: "successful operation")]
@@ -61,7 +61,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="401">if no (valid) authentication is given</response>
         /// <response code="404">not found</response>
         [HttpDelete]
-        [Route("/api/personal/assignments/{id}/")]
+        [Route("/personal/assignments/{id}/")]
         [ValidateModelState]
         [SwaggerOperation("PersonalAssignmentsIdDelete")]
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
@@ -86,7 +86,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="200">successful operation</response>
         /// <response code="404">not found</response>
         [HttpGet]
-        [Route("/api/personal/assignments/{id}/")]
+        [Route("/personal/assignments/{id}/")]
         [ValidateModelState]
         [SwaggerOperation("PersonalAssignmentsIdGet")]
         [SwaggerResponse(statusCode: 200, type: typeof(Assignment), description: "successful operation")]
@@ -119,7 +119,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="401">if no (valid) authentication is given</response>
         /// <response code="422">if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist or mismatching id in url and object </response>
         [HttpPut]
-        [Route("/api/personal/assignments/{id}/")]
+        [Route("/personal/assignments/{id}/")]
         [Consumes("application/json")]
         [ValidateModelState]
         [SwaggerOperation("PersonalAssignmentsIdPut")]
@@ -152,7 +152,7 @@ namespace Org.OpenAPITools.Controllers
         /// <response code="401">if no (valid) authentication is given</response>
         /// <response code="422">if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist </response>
         [HttpPost]
-        [Route("/api/personal/assignments/")]
+        [Route("/personal/assignments/")]
         [Consumes("application/json")]
         [ValidateModelState]
         [SwaggerOperation("PersonalAssignmentsPost")]

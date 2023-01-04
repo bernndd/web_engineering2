@@ -33,7 +33,7 @@ namespace Org.OpenAPITools.Controllers
         /// </summary>
         /// <response code="200">successful operation</response>
         [HttpGet]
-        [Route("/api/personal/status/")]
+        [Route("/personal/status/")]
         [ValidateModelState]
         [SwaggerOperation("PersonalStatusGet")]
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalStatusGet200Response), description: "successful operation")]
@@ -43,7 +43,7 @@ namespace Org.OpenAPITools.Controllers
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(PersonalStatusGet200Response));
             string exampleJson = null;
-            exampleJson = "{\n  \"authors\" : [ \"authors\", \"authors\" ]\n}";
+            exampleJson = "{\n  \"authors\" : [ \"Simon\", \"Bernd\" ]\n}";
             
             var example = exampleJson != null
             ? JsonConvert.DeserializeObject<PersonalStatusGet200Response>(exampleJson)
