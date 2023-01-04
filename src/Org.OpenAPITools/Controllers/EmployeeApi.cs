@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Connections;
 using System.Net.Http;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Query.ExpressionTranslators.Internal;
 using personal.Helpers;
+using Npgsql.Internal.TypeHandlers;
 
 namespace Org.OpenAPITools.Controllers
 {
@@ -53,18 +54,18 @@ namespace Org.OpenAPITools.Controllers
 
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(PersonalEmployeesGet200Response));
-            string exampleJson = null;
-            exampleJson = "{\n  \"employees\" : [ {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  }, {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  } ]\n}";
+            //string exampleJson = null;
+            //exampleJson = "{\n  \"employees\" : [ {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  }, {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  } ]\n}";
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<PersonalEmployeesGet200Response>(exampleJson)
-            : default(PersonalEmployeesGet200Response);
+            //var example = exampleJson != null
+            //  ? JsonConvert.DeserializeObject<PersonalEmployeesGet200Response>(exampleJson)
+            //  : default(PersonalEmployeesGet200Response);
             //TODO: Change the data returned
             //return new ObjectResult(example);
 
             var employees = databaseContext.employees;
             return new JsonResult(employees);
-         
+
         }
 
         /// <summary>
@@ -84,6 +85,18 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "deletion not possible because of existing assignments")]
         public virtual IActionResult PersonalEmployeesIdDelete([FromRoute(Name = "id")][Required] Guid id)
         {
+            var employee = databaseContext.employees.Find(id);
+            if (employee != null)
+            {
+                //if(databaseContext.assignments)
+                databaseContext.Remove(employee);
+                databaseContext.SaveChanges;
+                return StatusCode(204);
+            }
+            else
+            {
+                return StatusCode(404);
+            }
 
             //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(204);
@@ -111,25 +124,18 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
         public virtual IActionResult PersonalEmployeesIdGet([FromRoute(Name = "id")][Required] Guid id)
         {
-
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Employee));
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(Error));
-            string exampleJson = null;
-            exampleJson = "{\n  \"name\" : \"Max Specimeno\",\n  \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n}";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<Employee>(exampleJson)
-            : default(Employee);
-            //TODO: Change the data returned
-            return new ObjectResult(example);
+            var employee = databaseContext.employees.Find(id);
+            if (employee!= null)
+            {
+                return StatusCode(200, new JsonResult(employee));
+            }
+            else return StatusCode(404, default(Error));
         }
 
         /// <summary>
         /// add or update an employee by id
         /// </summary>
-        /// <remarks>if an id is supplied in the object, it MUST mach with the one in the url</remarks>
+        /// <remarks>if an id is supplied in the object, it MUST match with the one in the url</remarks>
         /// <param name="id">uuid of the employee</param>
         /// <param name="employee"></param>
         /// <response code="204">successful operation</response>
@@ -146,18 +152,40 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "mismatching id in url and object")]
         public virtual IActionResult PersonalEmployeesIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Employee employee)
         {
+            // HIER MUSS NOCH EINS ERSTELLT WERDEN WENN NICHT VORHANDEN
+            if (employee.id == Guid.Empty) { return StatusCode(422); }
 
-            //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(204);
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(Error));
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(Error));
-            //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(422, default(Error));
+            if (employee.id == id)
+            {
+                var exis_empl = databaseContext.employees.Find(employee.id);
+                if (exis_empl != null) //id gegeben und wurde gefunden UPDATE
+                {
+                    exis_empl.name = employee.name;
+                    databaseContext.Update(exis_empl);
+                }
+                else //id ist unbekannt oder wurde nicht gefunden CREATE
+                {
+                    databaseContext.employees.Add(employee);
+                }
+                databaseContext.SaveChanges();
+                return StatusCode(204);
 
-            throw new NotImplementedException();
+
+            }
+            else return StatusCode(422, "Mismatch in ID and Object");
         }
+
+        //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+        // return StatusCode(204);
+        //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+        // return StatusCode(400, default(Error));
+        //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+        // return StatusCode(401, default(Error));
+        //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+        // return StatusCode(422, default(Error));
+
+
+
 
         /// <summary>
         /// add a new employee
@@ -179,8 +207,28 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         public virtual IActionResult PersonalEmployeesPost([FromBody] Employee employee)
         {
-            databaseContext.employees.Add(employee);
-            databaseContext.SaveChanges();
+            if (employee.id == Guid.Empty)
+            {
+                //No id is given in request body So it creates employee id, pushes employee with id and name to database 
+                //TODO ID GEBEN employee.id = UuidHandler();
+                databaseContext.employees.Add(employee);
+                databaseContext.SaveChanges();
+            }
+            else
+            {
+                var exis_empl = databaseContext.employees.Find(employee.id);
+                if (exis_empl != null) //id gegeben und wurde gefunden UPDATE
+                {
+                    exis_empl.name = employee.name;
+                    databaseContext.Update(exis_empl);
+                    databaseContext.SaveChanges();
+                }
+                else //id ist unbekannt oder wurde nicht gefunden CREATE
+                {
+                    databaseContext.employees.Add(employee);
+                    databaseContext.SaveChanges();
+                }
+            }
             //Validate Fehlgeschlagen --> 401
             //TODO: http://${KEYCLOAK_HOST}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
 

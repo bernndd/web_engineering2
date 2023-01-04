@@ -35,7 +35,7 @@ namespace Org.OpenAPITools.Models
         /// </summary>
         /// <value>the id of the assignment</value>
         [DataMember(Name = "id", EmitDefaultValue = false)]
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
 
         /// <summary>
         /// the id of the employee this assignment references
@@ -43,7 +43,7 @@ namespace Org.OpenAPITools.Models
         /// <value>the id of the employee this assignment references</value>
         [Required]
         [DataMember(Name = "employee_id", EmitDefaultValue = false)]
-        public Guid EmployeeId { get; set; }
+        public Guid employee_id { get; set; }
 
         /// <summary>
         /// the id of the reservation this assignment references
@@ -51,7 +51,7 @@ namespace Org.OpenAPITools.Models
         /// <value>the id of the reservation this assignment references</value>
         [Required]
         [DataMember(Name = "reservation_id", EmitDefaultValue = false)]
-        public Guid ReservationId { get; set; }
+        public Guid reservation_id { get; set; }
 
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Org.OpenAPITools.Models
         /// <value>the role which the employee impersonates in this assignment</value>
         [Required]
         [DataMember(Name = "role", EmitDefaultValue = true)]
-        public RoleEnum Role { get; set; }
+        public RoleEnum role { get; set; }
 
 
         /// <summary>
@@ -93,10 +93,10 @@ namespace Org.OpenAPITools.Models
         {
             var sb = new StringBuilder();
             sb.Append("class Assignment {\n");
-            sb.Append("  Id: ").Append(Id).Append("\n");
-            sb.Append("  EmployeeId: ").Append(EmployeeId).Append("\n");
-            sb.Append("  ReservationId: ").Append(ReservationId).Append("\n");
-            sb.Append("  Role: ").Append(Role).Append("\n");
+            sb.Append("  id: ").Append(id).Append("\n");
+            sb.Append("  employee_id: ").Append(employee_id).Append("\n");
+            sb.Append("  reservation_id: ").Append(reservation_id).Append("\n");
+            sb.Append("  role: ").Append(role).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -134,24 +134,24 @@ namespace Org.OpenAPITools.Models
 
             return
                 (
-                    Id == other.Id ||
-                    Id != null &&
-                    Id.Equals(other.Id)
+                    id == other.id ||
+                    id != null &&
+                    id.Equals(other.id)
                 ) &&
                 (
-                    EmployeeId == other.EmployeeId ||
-                    EmployeeId != null &&
-                    EmployeeId.Equals(other.EmployeeId)
+                    employee_id == other.employee_id ||
+                    employee_id != null &&
+                    employee_id.Equals(other.employee_id)
                 ) &&
                 (
-                    ReservationId == other.ReservationId ||
-                    ReservationId != null &&
-                    ReservationId.Equals(other.ReservationId)
+                    reservation_id == other.reservation_id ||
+                    reservation_id != null &&
+                    reservation_id.Equals(other.reservation_id)
                 ) &&
                 (
-                    Role == other.Role ||
+                    role == other.role ||
 
-                    Role.Equals(other.Role)
+                    role.Equals(other.role)
                 );
         }
 
@@ -165,14 +165,14 @@ namespace Org.OpenAPITools.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                if (Id != null)
-                    hashCode = hashCode * 59 + Id.GetHashCode();
-                if (EmployeeId != null)
-                    hashCode = hashCode * 59 + EmployeeId.GetHashCode();
-                if (ReservationId != null)
-                    hashCode = hashCode * 59 + ReservationId.GetHashCode();
+                if (id != null)
+                    hashCode = hashCode * 59 + id.GetHashCode();
+                if (employee_id != null)
+                    hashCode = hashCode * 59 + employee_id.GetHashCode();
+                if (reservation_id != null)
+                    hashCode = hashCode * 59 + reservation_id.GetHashCode();
 
-                hashCode = hashCode * 59 + Role.GetHashCode();
+                hashCode = hashCode * 59 + role.GetHashCode();
                 return hashCode;
             }
         }

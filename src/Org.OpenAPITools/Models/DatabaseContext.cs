@@ -12,7 +12,7 @@ namespace Org.OpenAPITools.Models
 
         }
 
-        public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<Assignment> assignments { get; set; }
          public DbSet<Employee> employees { get; set; }
 
     }
