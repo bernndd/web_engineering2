@@ -89,8 +89,9 @@ namespace Org.OpenAPITools.Controllers
             if (employee != null)
             {
                 //if(databaseContext.assignments)
+                //hoer noch checken ob er noch assignements hat -> warum geht assignment db noch nicht???!
                 databaseContext.Remove(employee);
-                databaseContext.SaveChanges;
+                databaseContext.SaveChanges();
                 return StatusCode(204);
             }
             else
