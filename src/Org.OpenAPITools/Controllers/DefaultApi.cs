@@ -19,6 +19,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Newtonsoft.Json;
 using Org.OpenAPITools.Attributes;
 using Org.OpenAPITools.Models;
+using Npgsql;
 
 namespace Org.OpenAPITools.Controllers
 { 
@@ -39,6 +40,16 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalStatusGet200Response), description: "successful operation")]
         public virtual IActionResult PersonalStatusGet()
         {
+            var cs = "Server=localhost;Database=personal;Port=5432;UserId=postgres;Password=postgres";
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "SELECT version()";
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            var version = cmd.ExecuteScalar().ToString();
+            Console.WriteLine($"PostgreSQL version: {version}");
 
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(PersonalStatusGet200Response));
