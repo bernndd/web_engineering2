@@ -100,7 +100,7 @@ namespace Org.OpenAPITools.Controllers
 
                 databaseContext.Remove(employee);
                 databaseContext.SaveChanges();
-                return StatusCode(204);
+                return StatusCode(204, "successful operation");
             }
             else
             {
