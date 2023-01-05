@@ -46,6 +46,8 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalAssignmentsGet200Response), description: "successful operation")]
         public virtual IActionResult PersonalAssignmentsGet([FromQuery (Name = "employee_id")]Guid? employeeId)
         {
+            var assignments = databaseContext.assignments;
+            return new JsonResult(assignments);
 
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(PersonalAssignmentsGet200Response));

@@ -153,7 +153,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "mismatching id in url and object")]
         public virtual IActionResult PersonalEmployeesIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Employee employee)
         {
-            // HIER MUSS NOCH EINS ERSTELLT WERDEN WENN NICHT VORHANDEN
+            
             if (employee.id == Guid.Empty) { return StatusCode(422); }
 
             if (employee.id == id)

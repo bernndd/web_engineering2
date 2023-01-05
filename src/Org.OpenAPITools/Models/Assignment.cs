@@ -54,6 +54,12 @@ namespace Org.OpenAPITools.Models
         public Guid reservation_id { get; set; }
 
 
+        [DataMember(Name = "role", EmitDefaultValue = false)]
+        public string role { get; set; }
+
+        /*
+         * 
+         * 
         /// <summary>
         /// the role which the employee impersonates in this assignment
         /// </summary>
@@ -84,6 +90,8 @@ namespace Org.OpenAPITools.Models
         [DataMember(Name = "role", EmitDefaultValue = true)]
         public RoleEnum role { get; set; }
 
+
+        */
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -135,17 +143,17 @@ namespace Org.OpenAPITools.Models
             return
                 (
                     id == other.id ||
-                    id != null &&
+                    id != Guid.Empty &&
                     id.Equals(other.id)
                 ) &&
                 (
                     employee_id == other.employee_id ||
-                    employee_id != null &&
+                    employee_id != Guid.Empty &&
                     employee_id.Equals(other.employee_id)
                 ) &&
                 (
                     reservation_id == other.reservation_id ||
-                    reservation_id != null &&
+                    reservation_id != Guid.Empty &&
                     reservation_id.Equals(other.reservation_id)
                 ) &&
                 (
@@ -165,11 +173,11 @@ namespace Org.OpenAPITools.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                if (id != null)
+                if (id != Guid.Empty)
                     hashCode = hashCode * 59 + id.GetHashCode();
-                if (employee_id != null)
+                if (employee_id != Guid.Empty)
                     hashCode = hashCode * 59 + employee_id.GetHashCode();
-                if (reservation_id != null)
+                if (reservation_id != Guid.Empty)
                     hashCode = hashCode * 59 + reservation_id.GetHashCode();
 
                 hashCode = hashCode * 59 + role.GetHashCode();
