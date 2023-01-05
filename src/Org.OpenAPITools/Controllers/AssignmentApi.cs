@@ -52,7 +52,7 @@ namespace Org.OpenAPITools.Controllers
         {
             var assignments = databaseContext.assignments;
             return new JsonResult(assignments);
-          
+
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(PersonalAssignmentsGet200Response));
             string exampleJson = null;
@@ -217,7 +217,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(Error), description: "invalid input")]
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist ")]
-        public virtual  IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
+        public virtual IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
         {
 
             if (assignment.id == Guid.Empty)
@@ -235,104 +235,119 @@ namespace Org.OpenAPITools.Controllers
             //HTTP abfrage an employee
             try
             {
-               // HTTPAbfrage("http://localhost:8000/personal/employees/"+ assignment.employee_id);
+                string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
+                // Erstellen Sie eine neue HttpClient-Instanz
+                var client = new HttpClient();
+
+                // Senden Sie eine GET-Anfrage an die angegebene URL
+                var response = client.GetAsync(url).GetAwaiter().GetResult();
+
+                // Warten Sie, bis die Antwort empfangen wurde
+                response.EnsureSuccessStatusCode(); // Wirft eine Ausnahme, wenn der Statuscode nicht in der 2xx-Range liegt
+
+                // Lesen Sie den Antworttext als Zeichenkette
+                var responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+                
+
             }
             catch (HttpRequestException) { return StatusCode(422, "Employee not found"); }
-
+            
             try
             {
-                 //var Response = HTTPAbfrage("http://localhost:8000/reservations/"+ assignment.reservation_id);
+                string url = "http://localhost:8000/reservations/"+ assignment.reservation_id;
+                // Erstellen Sie eine neue HttpClient-Instanz
+                var client = new HttpClient();
+
+                // Senden Sie eine GET-Anfrage an die angegebene URL
+                var response = client.GetAsync(url).GetAwaiter().GetResult();
+
+                // Warten Sie, bis die Antwort empfangen wurde
+              // response.EnsureSuccessStatusCode(); // Wirft eine Ausnahme, wenn der Statuscode nicht in der 2xx-Range liegt
+
+                // Lesen Sie den Antworttext als Zeichenkette
+                var responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                var example = responseBody != null
+           ? JsonConvert.DeserializeObject<Assignment>(responseBody)
+           : default(Assignment);
+                //foreach (Assignment ass in responseBody){
+
+                //}
+                return StatusCode(420);
             }
             catch (HttpRequestException) { return StatusCode(422, "reservation not found"); }
 
-            
 
-                /*
-    # reservation has assignment with same role?
-    existing_assignment_reservations: list[Assignments] = session.query(Assignments).filter(Assignments.reservation_id==assignment.reservation_id).all()
-        if existing_assignment_reservations != []:
-            for existing_assignment_reservation in existing_assignment_reservations:
-                if existing_assignment_reservation.role == assignment.role:
-                    raise HTTPException(status_code= status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return StatusCode(911);
+            /*
+# reservation has assignment with same role?
+existing_assignment_reservations: list[Assignments] = session.query(Assignments).filter(Assignments.reservation_id==assignment.reservation_id).all()
+    if existing_assignment_reservations != []:
+        for existing_assignment_reservation in existing_assignment_reservations:
+            if existing_assignment_reservation.role == assignment.role:
+                raise HTTPException(status_code= status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        # assignment with same id existing?
-        existing_assignment = session.query(Assignments).filter(Assignments.id==assignment.id).first()
-        if existing_assignment:
-            #UPDATES assignment, pus,token: bool = Depends(validate)hes assignment to database
-            db_assignment = session.get(Assignments, assignment.id)
-            db_assignment.employee_id = assignment.employee_id
-            db_assignment.reservation_id = assignment.reservation_id
-            db_assignment.role = assignment.role
-            session.add(db_assignment)
-            session.commit()
-            raise HTTPException(status_code= status.HTTP_200_OK, detail= "")
-        else:
-            #CREATES assignment, pushes assignment to database
-            db_assignment = Assignments.from_orm(assignment)
-            session.add(db_assignment)
-            session.commit()
-            raise HTTPException(status_code= status.HTTP_201_CREATED)
-
-
+    # assignment with same id existing?
+    existing_assignment = session.query(Assignments).filter(Assignments.id==assignment.id).first()
+    if existing_assignment:
+        #UPDATES assignment, pus,token: bool = Depends(validate)hes assignment to database
+        db_assignment = session.get(Assignments, assignment.id)
+        db_assignment.employee_id = assignment.employee_id
+        db_assignment.reservation_id = assignment.reservation_id
+        db_assignment.role = assignment.role
+        session.add(db_assignment)
+        session.commit()
+        raise HTTPException(status_code= status.HTTP_200_OK, detail= "")
+    else:
+        #CREATES assignment, pushes assignment to database
+        db_assignment = Assignments.from_orm(assignment)
+        session.add(db_assignment)
+        session.commit()
+        raise HTTPException(status_code= status.HTTP_201_CREATED)
 
 
 
 
-                databaseContext.asssignments.Add(assignment);
+
+
+            databaseContext.asssignments.Add(assignment);
+            databaseContext.SaveChanges();
+            var exis_empl = databaseContext.employees.Find(employee.id);
+            if (exis_empl != null) //id gegeben und wurde gefunden UPDATE
+            {
+                exis_empl.name = assignment.name;
+                databaseContext.Update(exis_empl);
                 databaseContext.SaveChanges();
-                var exis_empl = databaseContext.employees.Find(employee.id);
-                if (exis_empl != null) //id gegeben und wurde gefunden UPDATE
-                {
-                    exis_empl.name = assignment.name;
-                    databaseContext.Update(exis_empl);
-                    databaseContext.SaveChanges();
-                }
-                else //id ist unbekannt oder wurde nicht gefunden CREATE
-                {
-                    databaseContext.employees.Add(employee);
-                    databaseContext.SaveChanges();
-                } 
+            }
+            else //id ist unbekannt oder wurde nicht gefunden CREATE
+            {
+                databaseContext.employees.Add(employee);
+                databaseContext.SaveChanges();
+            } 
 
-                 */
+             */
 
-                //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-                // return StatusCode(200, default(Assignment));
-                //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-                // return StatusCode(201, default(Assignment));
-                //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-                // return StatusCode(400, default(Error));
-                //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-                // return StatusCode(401, default(Error));
-                //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-                // return StatusCode(422, default(Error));
-                string exampleJson = null;
-            exampleJson = "{\n  \"reservation_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n  \"role\" : \"service\",\n  \"employee_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n  \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n}";
+            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(200, default(Assignment));
+            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(201, default(Assignment));
+            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(400, default(Error));
+            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(401, default(Error));
+            //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(422, default(Error));
+            //string exampleJson = null;
+            //exampleJson = "";
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<Assignment>(exampleJson)
-            : default(Assignment);
-            //TODO: Change the data returned
-            return new ObjectResult(example);
+            //var example = exampleJson != null
+            //? JsonConvert.DeserializeObject<Assignment>(exampleJson)
+            //: default(Assignment);
+            ////TODO: Change the data returned
+            //return new ObjectResult(example);
         }
-
-        /*public async Task<string> HTTPAbfrage(string url)
-        {
-            // Erstellen Sie eine neue HttpClient-Instanz
-            var client = new HttpClient();
-
-
-            // Senden Sie eine GET-Anfrage an die angegebene URL
-            var response = await client.GetAsync(url);
-
-            // Warten Sie, bis die Antwort empfangen wurde
-            response.EnsureSuccessStatusCode(); // Wirft eine Ausnahme, wenn der Statuscode nicht in der 2xx-Range liegt
-
-            // Lesen Sie den Antworttext als Zeichenkette
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            return responseBody;
-        }*/
     }
 }
+
 
 
