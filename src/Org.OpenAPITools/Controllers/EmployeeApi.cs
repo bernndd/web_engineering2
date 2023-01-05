@@ -88,8 +88,16 @@ namespace Org.OpenAPITools.Controllers
             var employee = databaseContext.employees.Find(id);
             if (employee != null)
             {
-                //if(databaseContext.assignments)
-                //hoer noch checken ob er noch assignements hat -> warum geht assignment db noch nicht???!
+                foreach (var assignement in databaseContext.assignments)
+                {
+                    if (assignement.employee_id == employee.id)
+                    {
+                        //hat noch assignements
+                        return StatusCode(422, "deletion not possible because of existing assignments");
+                    }
+                }
+
+
                 databaseContext.Remove(employee);
                 databaseContext.SaveChanges();
                 return StatusCode(204);
@@ -153,7 +161,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "mismatching id in url and object")]
         public virtual IActionResult PersonalEmployeesIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Employee employee)
         {
-            
+
             if (employee.id == Guid.Empty) { return StatusCode(422); }
 
             if (employee.id == id)
@@ -211,7 +219,7 @@ namespace Org.OpenAPITools.Controllers
             if (employee.id == Guid.Empty)
             {
                 //No id is given in request body So it creates employee id, pushes employee with id and name to database 
-                //TODO ID GEBEN employee.id = UuidHandler();
+                employee.id = Guid.NewGuid();
                 databaseContext.employees.Add(employee);
                 databaseContext.SaveChanges();
             }
