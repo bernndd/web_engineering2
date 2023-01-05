@@ -217,7 +217,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(Error), description: "invalid input")]
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist ")]
-        public virtual IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
+        public virtual  IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
         {
 
             if (assignment.id == Guid.Empty)
@@ -241,7 +241,7 @@ namespace Org.OpenAPITools.Controllers
 
             try
             {
-                 var Response =await HTTPAbfrage("http://localhost:8000/reservations/"+ assignment.reservation_id);
+                 var Response = HTTPAbfrage("http://localhost:8000/reservations/"+ assignment.reservation_id);
             }
             catch (HttpRequestException) { return StatusCode(422, "reservation not found"); }
 
