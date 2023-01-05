@@ -235,13 +235,13 @@ namespace Org.OpenAPITools.Controllers
             //HTTP abfrage an employee
             try
             {
-                HTTPAbfrage("http://localhost:8000/personal/employees/"+ assignment.employee_id);
+               // HTTPAbfrage("http://localhost:8000/personal/employees/"+ assignment.employee_id);
             }
             catch (HttpRequestException) { return StatusCode(422, "Employee not found"); }
 
             try
             {
-                 var Response = HTTPAbfrage("http://localhost:8000/reservations/"+ assignment.reservation_id);
+                 //var Response = HTTPAbfrage("http://localhost:8000/reservations/"+ assignment.reservation_id);
             }
             catch (HttpRequestException) { return StatusCode(422, "reservation not found"); }
 
@@ -315,7 +315,7 @@ namespace Org.OpenAPITools.Controllers
             return new ObjectResult(example);
         }
 
-        public async Task<string> HTTPAbfrage(string url)
+        /*public async Task<string> HTTPAbfrage(string url)
         {
             // Erstellen Sie eine neue HttpClient-Instanz
             var client = new HttpClient();
@@ -331,7 +331,7 @@ namespace Org.OpenAPITools.Controllers
             var responseBody = await response.Content.ReadAsStringAsync();
 
             return responseBody;
-        }
+        }*/
     }
 }
 
