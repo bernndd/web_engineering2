@@ -215,12 +215,14 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         public virtual IActionResult PersonalEmployeesPost([FromBody] Employee employee)
         {
+          // Der 400 Statuscode wird automatisch beim umwandeln in ein GUID ausgelöst 
             if (employee.id == Guid.Empty)
             {
                 //No id is given in request body So it creates employee id, pushes employee with id and name to database 
                 employee.id = Guid.NewGuid();
                 databaseContext.employees.Add(employee);
                 databaseContext.SaveChanges();
+                return StatusCode(201);
             }
             else
             {
@@ -230,33 +232,19 @@ namespace Org.OpenAPITools.Controllers
                     exis_empl.name = employee.name;
                     databaseContext.Update(exis_empl);
                     databaseContext.SaveChanges();
+                    return StatusCode(200);
                 }
                 else //id ist unbekannt oder wurde nicht gefunden CREATE
                 {
                     databaseContext.employees.Add(employee);
                     databaseContext.SaveChanges();
+                    return StatusCode(201);
                 }
+
             }
+
             //Validate Fehlgeschlagen --> 401
-            //TODO: http://${KEYCLOAK_HOST}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
 
-
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Employee));
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(Employee));
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(Error));
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(Error));
-            string exampleJson = null;
-            exampleJson = "{\n  \"name\" : \"Max Specimeno\",\n  \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n}";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<Employee>(exampleJson)
-            : default(Employee);
-            //TODO: Change the data returned
-            return new ObjectResult(example);
         }
     }
 }

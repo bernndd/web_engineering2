@@ -23,6 +23,8 @@ using Org.OpenAPITools.Attributes;
 using Org.OpenAPITools.Models;
 using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
+using System.Net;
+using System.Linq;
 
 namespace Org.OpenAPITools.Controllers
 {
@@ -232,6 +234,7 @@ namespace Org.OpenAPITools.Controllers
             }
 
 
+            //TODO Umgebungsvariablen umschreiben nicht statisch
             string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
             if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
@@ -239,12 +242,31 @@ namespace Org.OpenAPITools.Controllers
             }
             else { return StatusCode(422, "Employee not found"); }
 
+            //TODO Umgebungsvariablen umschreiben nicht statisch
             url = "http://localhost/api/reservations/"+ assignment.reservation_id+"/";
             if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
                 //reservation gefunden
             }
             else { return StatusCode(422, "Reservation not found"); }
+
+
+            // reservation hat assignment mit gleicher role?
+            List<Assignment> existingAssignmentReservations = databaseContext.assignments.Where(a => a.reservation_id == assignment.reservation_id)
+                .ToList();
+
+            if (existingAssignmentReservations.Count > 0)
+            {
+                foreach (Assignment existingAssignmentReservation in existingAssignmentReservations)
+                {
+                    if (existingAssignmentReservation.role == assignment.role)
+                    {
+                        return StatusCode(422, "Reservation already has assignement with same role");
+                    }
+                }
+            }
+
+            //create assignment
 
             return StatusCode(420);
 
