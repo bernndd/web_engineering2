@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 
-namespace personal.Helpers
+namespace Org.OpenAPITools.Helpers
 {
     public  class JwtValidate
     {

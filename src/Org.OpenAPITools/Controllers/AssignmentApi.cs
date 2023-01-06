@@ -232,64 +232,37 @@ namespace Org.OpenAPITools.Controllers
             }
 
 
-            //HTTP abfrage an employee
-            try
+            string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
+            if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
-                string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
-                // Erstellen Sie eine neue HttpClient-Instanz
-                var client = new HttpClient();
-
-                // Senden Sie eine GET-Anfrage an die angegebene URL
-                var response = client.GetAsync(url).GetAwaiter().GetResult();
-
-                // Warten Sie, bis die Antwort empfangen wurde
-                response.EnsureSuccessStatusCode(); // Wirft eine Ausnahme, wenn der Statuscode nicht in der 2xx-Range liegt
-
-                // Lesen Sie den Antworttext als Zeichenkette
-                var responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                
-
+                //Employee gefunden
             }
-            catch (HttpRequestException) { return StatusCode(422, "Employee not found"); }
-            
-            try
+            else { return StatusCode(422, "Employee not found"); }
+
+            url = "http://localhost:8000/reservations/"+ assignment.reservation_id;
+            if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
-                string url = "http://localhost:8000/reservations/"+ assignment.reservation_id;
-                // Erstellen Sie eine neue HttpClient-Instanz
-                var client = new HttpClient();
-
-                // Senden Sie eine GET-Anfrage an die angegebene URL
-                var response = client.GetAsync(url).GetAwaiter().GetResult();
-
-                // Warten Sie, bis die Antwort empfangen wurde
-              // response.EnsureSuccessStatusCode(); // Wirft eine Ausnahme, wenn der Statuscode nicht in der 2xx-Range liegt
-
-                // Lesen Sie den Antworttext als Zeichenkette
-                var responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var example = responseBody != null
-           ? JsonConvert.DeserializeObject<Assignment>(responseBody)
-           : default(Assignment);
-                //foreach (Assignment ass in responseBody){
-
-                //}
-                return StatusCode(420);
+                //reservation gefunden
             }
-            catch (HttpRequestException) { return StatusCode(422, "reservation not found"); }
+            else { return StatusCode(422, "Reservation not found"); }
+
+            return StatusCode(420);
 
 
             return StatusCode(911);
+
+
             /*
-# reservation has assignment with same role?
-existing_assignment_reservations: list[Assignments] = session.query(Assignments).filter(Assignments.reservation_id==assignment.reservation_id).all()
-    if existing_assignment_reservations != []:
+        # reservation has assignment with same role?
+        existing_assignment_reservations: list[Assignments] = session.query(Assignments).filter(Assignments.reservation_id==assignment.reservation_id).all()
+        if existing_assignment_reservations != []:
         for existing_assignment_reservation in existing_assignment_reservations:
             if existing_assignment_reservation.role == assignment.role:
                 raise HTTPException(status_code= status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-    # assignment with same id existing?
-    existing_assignment = session.query(Assignments).filter(Assignments.id==assignment.id).first()
-    if existing_assignment:
+        # assignment with same id existing?
+        existing_assignment = session.query(Assignments).filter(Assignments.id==assignment.id).first()
+        if existing_assignment:
         #UPDATES assignment, pus,token: bool = Depends(validate)hes assignment to database
         db_assignment = session.get(Assignments, assignment.id)
         db_assignment.employee_id = assignment.employee_id
@@ -298,7 +271,7 @@ existing_assignment_reservations: list[Assignments] = session.query(Assignments)
         session.add(db_assignment)
         session.commit()
         raise HTTPException(status_code= status.HTTP_200_OK, detail= "")
-    else:
+        else:
         #CREATES assignment, pushes assignment to database
         db_assignment = Assignments.from_orm(assignment)
         session.add(db_assignment)
@@ -346,7 +319,9 @@ existing_assignment_reservations: list[Assignments] = session.query(Assignments)
             ////TODO: Change the data returned
             //return new ObjectResult(example);
         }
+
     }
+
 }
 
 
