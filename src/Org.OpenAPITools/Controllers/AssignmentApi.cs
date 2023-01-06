@@ -52,8 +52,17 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalAssignmentsGet200Response), description: "successful operation")]
         public virtual IActionResult PersonalAssignmentsGet([FromQuery(Name = "employee_id")] Guid? employeeId)
         {
-            var assignments = databaseContext.assignments;
-            return new JsonResult(assignments);
+            if (employeeId == null)
+            {
+                var assignments = databaseContext.assignments;
+                return new JsonResult(assignments);
+            }
+            else
+            {
+                List<Assignment> matchingempl = databaseContext.assignments.Where(a => a.employee_id == employeeId)
+                    .ToList();
+                return new JsonResult(matchingempl);
+            }
 
         }
 
@@ -83,7 +92,7 @@ namespace Org.OpenAPITools.Controllers
             {
                 return StatusCode(404);
             }
-            
+
 
             throw new NotImplementedException();
         }
@@ -320,6 +329,7 @@ namespace Org.OpenAPITools.Controllers
                 exis_ass.employee_id = assignment.employee_id;
                 exis_ass.reservation_id = assignment.reservation_id;
                 exis_ass.role = assignment.role;
+        //konvertierungsproblem
                 databaseContext.Update(exis_ass);
                 databaseContext.SaveChanges();
                 return StatusCode(200);
