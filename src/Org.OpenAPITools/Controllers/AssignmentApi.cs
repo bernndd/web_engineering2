@@ -55,16 +55,6 @@ namespace Org.OpenAPITools.Controllers
             var assignments = databaseContext.assignments;
             return new JsonResult(assignments);
 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(PersonalAssignmentsGet200Response));
-            string exampleJson = null;
-            exampleJson = "{\n  \"assignments\" : [ {\n    \"reservation_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n    \"role\" : \"service\",\n    \"employee_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  }, {\n    \"reservation_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n    \"role\" : \"service\",\n    \"employee_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  } ]\n}";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<PersonalAssignmentsGet200Response>(exampleJson)
-            : default(PersonalAssignmentsGet200Response);
-            //TODO: Change the data returned
-            return new ObjectResult(example);
         }
 
         /// <summary>
@@ -85,7 +75,6 @@ namespace Org.OpenAPITools.Controllers
             var assignment = databaseContext.assignments.Find(id);
             if (assignment != null)
             {
-
                 databaseContext.Remove(assignment);
                 databaseContext.SaveChanges();
                 return StatusCode(204);
@@ -94,12 +83,7 @@ namespace Org.OpenAPITools.Controllers
             {
                 return StatusCode(404);
             }
-            //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(204);
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(Error));
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(Error));
+            
 
             throw new NotImplementedException();
         }
@@ -161,9 +145,80 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist or mismatching id in url and object ")]
         public virtual IActionResult PersonalAssignmentsIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Assignment assignment)
         {
+            if (assignment.id == id)
+            {
+                if ((assignment.role!="service") &(assignment.role !="cleanup"))
+                {
+                    //keine richtige rolle
+                    return StatusCode(422, "NO valid Role");
+                }
 
-            if (assignment.id == Guid.Empty) { return StatusCode(422); }
 
+                //TODO Umgebungsvariablen umschreiben nicht statisch
+                string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
+                if (Helpers.ApiRequest.HTTPreq(url).Result)
+                {
+                    //Employee gefunden
+                }
+                else { return StatusCode(422, "Employee not found"); }
+
+                //TODO Umgebungsvariablen umschreiben nicht statisch
+                url = "http://localhost/api/reservations/"+ assignment.reservation_id+"/";
+                if (Helpers.ApiRequest.HTTPreq(url).Result)
+                {
+                    //reservation gefunden
+                }
+                else { return StatusCode(422, "Reservation not found"); }
+
+
+                // reservation hat assignment mit gleicher role?
+                List<Assignment> existingAssignmentReservations = databaseContext.assignments.Where(a => a.reservation_id == assignment.reservation_id)
+                    .ToList();
+
+                if (existingAssignmentReservations.Count > 0)
+                {
+                    foreach (Assignment existingAssignmentReservation in existingAssignmentReservations)
+                    {
+                        if (existingAssignmentReservation.role == assignment.role)
+                        {
+                            return StatusCode(422, "Reservation already has assignement with same role");
+                        }
+                    }
+                }
+
+                //Keine id übergeben
+                if (assignment.id == Guid.Empty)
+                {
+                    //No id is given in request body So it creates assig id 
+                    assignment.id = Guid.NewGuid();
+
+                }
+
+                //gibt es das assignment mit der id schon?
+                var exis_ass = databaseContext.assignments.Find(assignment.id);
+                if (exis_ass != null)//Gibt es schon UPDATE
+                {
+                    exis_ass.employee_id = assignment.employee_id;
+                    exis_ass.reservation_id = assignment.reservation_id;
+                    exis_ass.role = assignment.role;
+                    databaseContext.Update(exis_ass);
+                    databaseContext.SaveChanges();
+                    return StatusCode(200);
+                }
+                else //id ist unbekannt oder wurde nicht gefunden CREATE
+                {
+                    databaseContext.assignments.Add(assignment);
+                    databaseContext.SaveChanges();
+                    return StatusCode(201);
+                }
+            }
+            else return StatusCode(422, "Mismatch in ID and Object");
+        }
+
+
+
+
+        /*
             if (assignment.id == id)
             {
                 var old_ass = databaseContext.assignments.Find(assignment.id);
@@ -187,17 +242,7 @@ namespace Org.OpenAPITools.Controllers
             else return StatusCode(422, "Mismatch in ID and Object");
         }
 
-        //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(204);
-        //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(400, default(Error));
-        //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(401, default(Error));
-        //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(422, default(Error));
-
-
-
+        */
 
         /// <summary>
         /// add a new assignment
@@ -221,13 +266,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist ")]
         public virtual IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
         {
-
-            if (assignment.id == Guid.Empty)
-            {
-                //No id is given in request body So it creates assig id, pushes assignment to database 
-                assignment.id = Guid.NewGuid();
-            }
-            else if ((assignment.role!="service") &(assignment.role !="cleanup"))
+            if ((assignment.role!="service") &(assignment.role !="cleanup"))
             {
                 //keine richtige rolle
                 return StatusCode(422, "NO valid Role");
@@ -266,84 +305,37 @@ namespace Org.OpenAPITools.Controllers
                 }
             }
 
-            //create assignment
-
-            return StatusCode(420);
-
-
-
-
-            /*
-        # reservation has assignment with same role?
-        existing_assignment_reservations: list[Assignments] = session.query(Assignments).filter(Assignments.reservation_id==assignment.reservation_id).all()
-        if existing_assignment_reservations != []:
-        for existing_assignment_reservation in existing_assignment_reservations:
-            if existing_assignment_reservation.role == assignment.role:
-                raise HTTPException(status_code= status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-        # assignment with same id existing?
-        existing_assignment = session.query(Assignments).filter(Assignments.id==assignment.id).first()
-        if existing_assignment:
-        #UPDATES assignment, pus,token: bool = Depends(validate)hes assignment to database
-        db_assignment = session.get(Assignments, assignment.id)
-        db_assignment.employee_id = assignment.employee_id
-        db_assignment.reservation_id = assignment.reservation_id
-        db_assignment.role = assignment.role
-        session.add(db_assignment)
-        session.commit()
-        raise HTTPException(status_code= status.HTTP_200_OK, detail= "")
-        else:
-        #CREATES assignment, pushes assignment to database
-        db_assignment = Assignments.from_orm(assignment)
-        session.add(db_assignment)
-        session.commit()
-        raise HTTPException(status_code= status.HTTP_201_CREATED)
-
-
-
-
-
-
-            databaseContext.asssignments.Add(assignment);
-            databaseContext.SaveChanges();
-            var exis_empl = databaseContext.employees.Find(employee.id);
-            if (exis_empl != null) //id gegeben und wurde gefunden UPDATE
+            //Keine id übergeben
+            if (assignment.id == Guid.Empty)
             {
-                exis_empl.name = assignment.name;
-                databaseContext.Update(exis_empl);
+                //No id is given in request body So it creates assig id 
+                assignment.id = Guid.NewGuid();
+
+            }
+
+            //gibt es das assignment mit der id schon?
+            var exis_ass = databaseContext.assignments.Find(assignment.id);
+            if (exis_ass != null)//Gibt es schon UPDATE
+            {
+                exis_ass.employee_id = assignment.employee_id;
+                exis_ass.reservation_id = assignment.reservation_id;
+                exis_ass.role = assignment.role;
+                databaseContext.Update(exis_ass);
                 databaseContext.SaveChanges();
+                return StatusCode(200);
             }
             else //id ist unbekannt oder wurde nicht gefunden CREATE
             {
-                databaseContext.employees.Add(employee);
+                databaseContext.assignments.Add(assignment);
                 databaseContext.SaveChanges();
-            } 
-
-             */
-
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Assignment));
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(Assignment));
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(Error));
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(Error));
-            //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(422, default(Error));
-            //string exampleJson = null;
-            //exampleJson = "";
-
-            //var example = exampleJson != null
-            //? JsonConvert.DeserializeObject<Assignment>(exampleJson)
-            //: default(Assignment);
-            ////TODO: Change the data returned
-            //return new ObjectResult(example);
+                return StatusCode(201);
+            }
         }
-
     }
 
 }
+
+
 
 
 
