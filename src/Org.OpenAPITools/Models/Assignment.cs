@@ -54,6 +54,11 @@ namespace Org.OpenAPITools.Models
         public Guid reservation_id { get; set; }
 
 
+        /// <summary>
+        /// the role which the employee impersonates in this assignment
+        /// </summary>
+        /// <value>the role which the employee impersonates in this assignment</value>
+        [Required]
         [DataMember(Name = "role", EmitDefaultValue = false)]
         public string role { get; set; }
 
