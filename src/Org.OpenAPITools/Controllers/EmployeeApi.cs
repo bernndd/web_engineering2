@@ -22,7 +22,6 @@ using Org.OpenAPITools.Models;
 using Microsoft.AspNetCore.Connections;
 using System.Net.Http;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Query.ExpressionTranslators.Internal;
-using personal.Helpers;
 using Npgsql.Internal.TypeHandlers;
 
 namespace Org.OpenAPITools.Controllers

@@ -24,7 +24,7 @@ using Org.OpenAPITools.Authentication;
 using Org.OpenAPITools.Filters;
 using Org.OpenAPITools.OpenApi;
 using Org.OpenAPITools.Formatters;
-using personal.Helpers;
+using Org.OpenAPITools.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Org.OpenAPITools.Models;
 

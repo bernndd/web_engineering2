@@ -239,7 +239,7 @@ namespace Org.OpenAPITools.Controllers
             }
             else { return StatusCode(422, "Employee not found"); }
 
-            url = "http://localhost:8000/reservations/"+ assignment.reservation_id;
+            url = "http://localhost/api/reservations/"+ assignment.reservation_id+"/";
             if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
                 //reservation gefunden
@@ -249,7 +249,6 @@ namespace Org.OpenAPITools.Controllers
             return StatusCode(420);
 
 
-            return StatusCode(911);
 
 
             /*

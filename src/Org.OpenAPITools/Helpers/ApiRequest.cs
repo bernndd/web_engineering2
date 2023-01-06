@@ -6,9 +6,9 @@ namespace Org.OpenAPITools.Helpers
 {
     public class ApiRequest
     {
-        public ApiRequest(string url)
+        public ApiRequest()
         {
-           return HTTPreq(url);
+           
         }
         public static async Task<bool> HTTPreq(string url)
         {
