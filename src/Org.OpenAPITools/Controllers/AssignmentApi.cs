@@ -369,9 +369,9 @@ namespace Org.OpenAPITools.Controllers
             }
             else //id ist unbekannt oder wurde nicht gefunden CREATE
             {
-                string roleString = assignment.role.ToString();
+                //string roleString = assignment.role.ToString();
                 //assignment_role role = (assignment_role)Enum.Parse(typeof(assignment_role), roleString);
-                assignment.role = roleString.Cast<RoleEnum>;
+               // assignment.role = roleString<RoleEnum>;
 
                 databaseContext.assignments.Add(assignment);
                 databaseContext.SaveChanges();
