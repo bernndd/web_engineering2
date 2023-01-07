@@ -25,6 +25,9 @@ using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
 using System.Net;
 using System.Linq;
+using static Org.OpenAPITools.Models.Assignment;
+using Npgsql;
+using System.Data;
 
 namespace Org.OpenAPITools.Controllers
 {
@@ -156,7 +159,8 @@ namespace Org.OpenAPITools.Controllers
         {
             if (assignment.id == id)
             {
-                if ((assignment.role!="service") &(assignment.role !="cleanup"))
+                //if ((assignment.role!="service") &(assignment.role !="cleanup"))
+                if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
                 {
                     //keine richtige rolle
                     return StatusCode(422, "NO valid Role");
@@ -253,6 +257,7 @@ namespace Org.OpenAPITools.Controllers
 
         */
 
+
         /// <summary>
         /// add a new assignment
         /// </summary>
@@ -275,7 +280,10 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist ")]
         public virtual IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
         {
-            if ((assignment.role!="service") &(assignment.role !="cleanup"))
+            //if ((assignment.role!="service") &(assignment.role !="cleanup"))
+
+
+            if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
             {
                 //keine richtige rolle
                 return StatusCode(422, "NO valid Role");
@@ -300,9 +308,33 @@ namespace Org.OpenAPITools.Controllers
 
 
             // reservation hat assignment mit gleicher role?
-            List<Assignment> existingAssignmentReservations = databaseContext.assignments.Where(a => a.reservation_id == assignment.reservation_id)
-                .ToList();
+            // List<Assignment> existingAssignmentReservations = databaseContext.assignments.Where(a => a.reservation_id == assignment.reservation_id)
+            // .ToList();
+            List<Assignment> existingAssignmentReservations = new List<Assignment>();
 
+            using (var connection = new NpgsqlConnection("Server=localhost;Database=personal;Port=5432;User Id=postgres;Password=postgres"))
+            {
+                connection.Open();
+
+
+                using (var command = new NpgsqlCommand("SELECT * FROM assignments WHERE reservation_id = @reservation_id", connection))
+                {
+                    command.Parameters.AddWithValue("@reservation_id", assignment.reservation_id);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Assignment a = new Assignment();
+                            a.id = reader.GetFieldValue<Guid>("id");
+                            a.employee_id = reader.GetFieldValue<Guid>("employee_id");
+                            a.reservation_id = reader.GetFieldValue<Guid>("reservation_id");
+                           // a.role = (Assignment.RoleEnum)Enum.Parse(typeof(Assignment.RoleEnum), reader.GetFieldValue<string>("role"));
+                           a.role = reader.GetFieldValue<RoleEnum>("role");
+                            existingAssignmentReservations.Add(a);
+                        }
+                    }
+                }
+            }
             if (existingAssignmentReservations.Count > 0)
             {
                 foreach (Assignment existingAssignmentReservation in existingAssignmentReservations)
@@ -329,16 +361,22 @@ namespace Org.OpenAPITools.Controllers
                 exis_ass.employee_id = assignment.employee_id;
                 exis_ass.reservation_id = assignment.reservation_id;
                 exis_ass.role = assignment.role;
-        //konvertierungsproblem
+                string roleString = assignment.role.ToString();
+                //konvertierungsproblem
                 databaseContext.Update(exis_ass);
                 databaseContext.SaveChanges();
                 return StatusCode(200);
             }
             else //id ist unbekannt oder wurde nicht gefunden CREATE
             {
+                string roleString = assignment.role.ToString();
+                //assignment_role role = (assignment_role)Enum.Parse(typeof(assignment_role), roleString);
+                assignment.role = roleString.Cast<RoleEnum>;
+
                 databaseContext.assignments.Add(assignment);
                 databaseContext.SaveChanges();
                 return StatusCode(201);
+
             }
         }
     }
