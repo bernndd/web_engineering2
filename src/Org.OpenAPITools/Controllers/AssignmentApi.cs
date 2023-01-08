@@ -146,16 +146,16 @@ namespace Org.OpenAPITools.Controllers
                     return StatusCode(422, "NO valid Role");
                 }
 
-                //TODO Umgebungsvariablen umschreiben nicht statisch
-                string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
+                string employeeUri = Environment.GetEnvironmentVariable("PERSONAL_EMPLOYEE_URI") ?? "http://localhost:9000/personal/employees/";
+                string url = employeeUri + assignment.employee_id;
                 if (Helpers.ApiRequest.HTTPreq(url).Result)
                 {
                     //Employee gefunden
                 }
                 else { return StatusCode(422, "Employee not found"); }
 
-                //TODO Umgebungsvariablen umschreiben nicht statisch
-                url = "http://localhost/api/reservations/"+ assignment.reservation_id+"/";
+                string reservationsUri = Environment.GetEnvironmentVariable("PERSONAL_RESERVATIONS_URI") ?? "http://localhost/api/reservations/";
+                url = reservationsUri + assignment.reservation_id+"/";
                 if (Helpers.ApiRequest.HTTPreq(url).Result)
                 {
                     //reservation gefunden
@@ -236,16 +236,16 @@ namespace Org.OpenAPITools.Controllers
                 return StatusCode(422, "NO valid Role");
             }
 
-            //TODO Umgebungsvariablen umschreiben nicht statisch
-            string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
+            string employeeUri = Environment.GetEnvironmentVariable("PERSONAL_EMPLOYEE_URI") ?? "http://localhost:9000/personal/employees/";
+            string url = employeeUri + assignment.employee_id;
             if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
                 //Employee gefunden
             }
             else { return StatusCode(422, "Employee not found"); }
 
-            //TODO Umgebungsvariablen umschreiben nicht statisch
-            url = "http://localhost/api/reservations/"+ assignment.reservation_id+"/";
+            string reservationsUri = Environment.GetEnvironmentVariable("PERSONAL_RESERVATIONS_URI") ?? "http://localhost/api/reservations/";
+            url = reservationsUri + assignment.reservation_id+"/";
             if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
                 //reservation gefunden
