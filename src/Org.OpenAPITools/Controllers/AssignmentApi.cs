@@ -160,7 +160,8 @@ namespace Org.OpenAPITools.Controllers
             if (assignment.id == id)
             {
                 //if ((assignment.role!="service") &(assignment.role !="cleanup"))
-                if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
+                //if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
+                if ((assignment.role!=Assignment.assignment_role.cleanup) &(assignment.role !=Assignment.assignment_role.service))
                 {
                     //keine richtige rolle
                     return StatusCode(422, "NO valid Role");
@@ -283,7 +284,8 @@ namespace Org.OpenAPITools.Controllers
             //if ((assignment.role!="service") &(assignment.role !="cleanup"))
 
 
-            if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
+            //   if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
+            if ((assignment.role!=Assignment.assignment_role.cleanup) &(assignment.role !=Assignment.assignment_role.service))
             {
                 //keine richtige rolle
                 return StatusCode(422, "NO valid Role");
@@ -329,7 +331,7 @@ namespace Org.OpenAPITools.Controllers
                             a.employee_id = reader.GetFieldValue<Guid>("employee_id");
                             a.reservation_id = reader.GetFieldValue<Guid>("reservation_id");
                            // a.role = (Assignment.RoleEnum)Enum.Parse(typeof(Assignment.RoleEnum), reader.GetFieldValue<string>("role"));
-                           a.role = reader.GetFieldValue<RoleEnum>("role");
+                          a.role = reader.GetFieldValue<assignment_role>("role");
                             existingAssignmentReservations.Add(a);
                         }
                     }

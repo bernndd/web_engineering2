@@ -29,7 +29,6 @@ namespace Org.OpenAPITools.Models
     public partial class Assignment : IEquatable<Assignment>
     {
 
-
         /// <summary>
         /// the id of the assignment
         /// </summary>
@@ -65,9 +64,9 @@ namespace Org.OpenAPITools.Models
         /// the role which the employee impersonates in this assignment
         /// </summary>
         /// <value>the role which the employee impersonates in this assignment</value>
-        [TypeConverter(typeof(CustomEnumConverter<RoleEnum>))]
+        [TypeConverter(typeof(CustomEnumConverter<assignment_role>))]
         [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public enum RoleEnum
+        public enum assignment_role
         {
 
             /// <summary>
@@ -91,7 +90,7 @@ namespace Org.OpenAPITools.Models
         /// <value>the role which the employee impersonates in this assignment</value>
         [Required]
         [DataMember(Name = "role", EmitDefaultValue = true)]
-        public RoleEnum role { get; set; }
+        public assignment_role role { get; set; }
 
 
 
