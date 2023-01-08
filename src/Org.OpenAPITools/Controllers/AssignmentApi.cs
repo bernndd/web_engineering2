@@ -66,7 +66,6 @@ namespace Org.OpenAPITools.Controllers
                     .ToList();
                 return new JsonResult(matchingempl);
             }
-
         }
 
         /// <summary>
@@ -95,8 +94,6 @@ namespace Org.OpenAPITools.Controllers
             {
                 return StatusCode(404);
             }
-
-
             throw new NotImplementedException();
         }
 
@@ -114,27 +111,12 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
         public virtual IActionResult PersonalAssignmentsIdGet([FromRoute(Name = "id")][Required] Guid id)
         {
-
-
             var assignment = databaseContext.assignments.Find(id);
             if (assignment!= null)
             {
                 return StatusCode(200, new JsonResult(assignment));
             }
             else return StatusCode(404, default(Error));
-
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Assignment));
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(Error));
-            string exampleJson = null;
-            exampleJson = "{\n  \"reservation_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n  \"role\" : \"service\",\n  \"employee_id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\",\n  \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n}";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<Assignment>(exampleJson)
-            : default(Assignment);
-            //TODO: Change the data returned
-            return new ObjectResult(example);
         }
 
         /// <summary>
@@ -159,14 +141,11 @@ namespace Org.OpenAPITools.Controllers
         {
             if (assignment.id == id)
             {
-                //if ((assignment.role!="service") &(assignment.role !="cleanup"))
-                //if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
                 if ((assignment.role!=Assignment.assignment_role.cleanup) &(assignment.role !=Assignment.assignment_role.service))
                 {
                     //keine richtige rolle
                     return StatusCode(422, "NO valid Role");
                 }
-
 
                 //TODO Umgebungsvariablen umschreiben nicht statisch
                 string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
@@ -217,46 +196,17 @@ namespace Org.OpenAPITools.Controllers
                     exis_ass.role = assignment.role;
                     databaseContext.Update(exis_ass);
                     databaseContext.SaveChanges();
-                    return StatusCode(200);
+                    return StatusCode(204);
                 }
                 else //id ist unbekannt oder wurde nicht gefunden CREATE
                 {
                     databaseContext.assignments.Add(assignment);
                     databaseContext.SaveChanges();
-                    return StatusCode(201);
+                    return StatusCode(204);
                 }
             }
             else return StatusCode(422, "Mismatch in ID and Object");
         }
-
-
-
-
-        /*
-            if (assignment.id == id)
-            {
-                var old_ass = databaseContext.assignments.Find(assignment.id);
-                if (old_ass != null) //id gegeben und wurde gefunden UPDATE
-                {
-                    old_ass.reservation_id = assignment.reservation_id;
-                    old_ass.role= assignment.role;
-                    old_ass.employee_id= assignment.employee_id;
-
-                    databaseContext.Update(old_ass);
-                }
-                else //id ist unbekannt oder wurde nicht gefunden CREATE
-                {
-                    databaseContext.assignments.Add(assignment);
-                }
-                databaseContext.SaveChanges();
-                return StatusCode(204);
-
-
-            }
-            else return StatusCode(422, "Mismatch in ID and Object");
-        }
-
-        */
 
 
         /// <summary>
@@ -281,16 +231,11 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist ")]
         public virtual IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
         {
-            //if ((assignment.role!="service") &(assignment.role !="cleanup"))
-
-
-            //   if ((assignment.role!=Assignment.RoleEnum.cleanup) &(assignment.role !=Assignment.RoleEnum.service))
             if ((assignment.role!=Assignment.assignment_role.cleanup) &(assignment.role !=Assignment.assignment_role.service))
             {
                 //keine richtige rolle
                 return StatusCode(422, "NO valid Role");
             }
-
 
             //TODO Umgebungsvariablen umschreiben nicht statisch
             string url = "http://localhost:8000/personal/employees/" + assignment.employee_id;
@@ -308,35 +253,10 @@ namespace Org.OpenAPITools.Controllers
             }
             else { return StatusCode(422, "Reservation not found"); }
 
+            //reservation hat assignment mit gleicher role?
+            List<Assignment> existingAssignmentReservations = databaseContext.assignments.Where(a => a.reservation_id == assignment.reservation_id)
+            .ToList();
 
-            // reservation hat assignment mit gleicher role?
-            // List<Assignment> existingAssignmentReservations = databaseContext.assignments.Where(a => a.reservation_id == assignment.reservation_id)
-            // .ToList();
-            List<Assignment> existingAssignmentReservations = new List<Assignment>();
-
-            using (var connection = new NpgsqlConnection("Server=localhost;Database=personal;Port=5432;User Id=postgres;Password=postgres"))
-            {
-                connection.Open();
-
-
-                using (var command = new NpgsqlCommand("SELECT * FROM assignments WHERE reservation_id = @reservation_id", connection))
-                {
-                    command.Parameters.AddWithValue("@reservation_id", assignment.reservation_id);
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            Assignment a = new Assignment();
-                            a.id = reader.GetFieldValue<Guid>("id");
-                            a.employee_id = reader.GetFieldValue<Guid>("employee_id");
-                            a.reservation_id = reader.GetFieldValue<Guid>("reservation_id");
-                           // a.role = (Assignment.RoleEnum)Enum.Parse(typeof(Assignment.RoleEnum), reader.GetFieldValue<string>("role"));
-                          a.role = reader.GetFieldValue<assignment_role>("role");
-                            existingAssignmentReservations.Add(a);
-                        }
-                    }
-                }
-            }
             if (existingAssignmentReservations.Count > 0)
             {
                 foreach (Assignment existingAssignmentReservation in existingAssignmentReservations)
@@ -353,7 +273,6 @@ namespace Org.OpenAPITools.Controllers
             {
                 //No id is given in request body So it creates assig id 
                 assignment.id = Guid.NewGuid();
-
             }
 
             //gibt es das assignment mit der id schon?
@@ -363,26 +282,18 @@ namespace Org.OpenAPITools.Controllers
                 exis_ass.employee_id = assignment.employee_id;
                 exis_ass.reservation_id = assignment.reservation_id;
                 exis_ass.role = assignment.role;
-                string roleString = assignment.role.ToString();
-                //konvertierungsproblem
                 databaseContext.Update(exis_ass);
                 databaseContext.SaveChanges();
                 return StatusCode(200);
             }
             else //id ist unbekannt oder wurde nicht gefunden CREATE
             {
-                //string roleString = assignment.role.ToString();
-                //assignment_role role = (assignment_role)Enum.Parse(typeof(assignment_role), roleString);
-               // assignment.role = roleString<RoleEnum>;
-
                 databaseContext.assignments.Add(assignment);
                 databaseContext.SaveChanges();
                 return StatusCode(201);
-
             }
         }
     }
-
 }
 
 

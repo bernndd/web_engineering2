@@ -50,21 +50,8 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalEmployeesGet200Response), description: "successful operation")]
         public virtual IActionResult PersonalEmployeesGet()
         {
-
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(PersonalEmployeesGet200Response));
-            //string exampleJson = null;
-            //exampleJson = "{\n  \"employees\" : [ {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  }, {\n    \"name\" : \"Max Specimeno\",\n    \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\"\n  } ]\n}";
-
-            //var example = exampleJson != null
-            //  ? JsonConvert.DeserializeObject<PersonalEmployeesGet200Response>(exampleJson)
-            //  : default(PersonalEmployeesGet200Response);
-            //TODO: Change the data returned
-            //return new ObjectResult(example);
-
             var employees = databaseContext.employees;
             return new JsonResult(employees);
-
         }
 
         /// <summary>
@@ -95,8 +82,6 @@ namespace Org.OpenAPITools.Controllers
                         return StatusCode(422, "deletion not possible because of existing assignments");
                     }
                 }
-
-
                 databaseContext.Remove(employee);
                 databaseContext.SaveChanges();
                 return StatusCode(204, "successful operation");
@@ -105,17 +90,6 @@ namespace Org.OpenAPITools.Controllers
             {
                 return StatusCode(404);
             }
-
-            //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(204);
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(Error));
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(Error));
-            //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(422, default(Error));
-
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -160,9 +134,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "mismatching id in url and object")]
         public virtual IActionResult PersonalEmployeesIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Employee employee)
         {
-
             if (employee.id == Guid.Empty) { return StatusCode(422); }
-
             if (employee.id == id)
             {
                 var exis_empl = databaseContext.employees.Find(employee.id);
@@ -177,23 +149,9 @@ namespace Org.OpenAPITools.Controllers
                 }
                 databaseContext.SaveChanges();
                 return StatusCode(204);
-
-
             }
             else return StatusCode(422, "Mismatch in ID and Object");
         }
-
-        //TODO: Uncomment the next line to return response 204 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(204);
-        //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(400, default(Error));
-        //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(401, default(Error));
-        //TODO: Uncomment the next line to return response 422 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-        // return StatusCode(422, default(Error));
-
-
-
 
         /// <summary>
         /// add a new employee
@@ -215,7 +173,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         public virtual IActionResult PersonalEmployeesPost([FromBody] Employee employee)
         {
-          // Der 400 Statuscode wird automatisch beim umwandeln in ein GUID ausgelöst 
+            // Der 400 Statuscode wird automatisch beim umwandeln in ein GUID ausgelöst 
             if (employee.id == Guid.Empty)
             {
                 //No id is given in request body So it creates employee id, pushes employee with id and name to database 
@@ -240,11 +198,8 @@ namespace Org.OpenAPITools.Controllers
                     databaseContext.SaveChanges();
                     return StatusCode(201);
                 }
-
             }
-
             //Validate Fehlgeschlagen --> 401
-
         }
     }
 }
