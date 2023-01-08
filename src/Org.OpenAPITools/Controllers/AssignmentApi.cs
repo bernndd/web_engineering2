@@ -94,7 +94,6 @@ namespace Org.OpenAPITools.Controllers
             {
                 return StatusCode(404);
             }
-            throw new NotImplementedException();
         }
 
         /// <summary>

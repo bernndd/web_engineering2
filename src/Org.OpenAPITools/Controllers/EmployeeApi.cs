@@ -27,7 +27,7 @@ using Npgsql.Internal.TypeHandlers;
 namespace Org.OpenAPITools.Controllers
 {
     /// <summary>
-    /// 
+    /// Employee Controller
     /// </summary>
     [ApiController]
     public class EmployeeApiController : ControllerBase
