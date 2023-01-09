@@ -27,6 +27,9 @@ using Org.OpenAPITools.Formatters;
 using personal.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Org.OpenAPITools.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging;
 
 namespace Org.OpenAPITools
 {
@@ -109,6 +112,22 @@ namespace Org.OpenAPITools
                 });
                 services
                     .AddSwaggerGenNewtonsoftSupport();
+
+            services.AddLogging(builder =>
+                                   builder
+                                       .AddDebug()
+                                       .AddConsole()
+                                       .AddConfiguration(Configuration.GetSection("Logging"))
+                                       .SetMinimumLevel(LogLevel.Information)
+                               );
+
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                    {
+                        Configuration.Bind("JwtSettings", options);
+                        options.Events = AuthEventsHandler.Instance;
+                    });
 
         }
 

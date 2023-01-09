@@ -24,6 +24,10 @@ using System.Net.Http;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Query.ExpressionTranslators.Internal;
 using personal.Helpers;
 using Npgsql.Internal.TypeHandlers;
+using System.Runtime.CompilerServices;
+using System.Security.Claims;
+using Microsoft.Extensions.Primitives;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Org.OpenAPITools.Controllers
 {
@@ -216,6 +220,22 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         public virtual IActionResult PersonalEmployeesPost([FromBody] Employee employee)
         {
+            if(HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues headerValue))
+            {
+                string token = headerValue;
+                if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
+                {
+                    token = token.Substring("Bearer ".Length);
+
+                    JwtValidate jwtValidate = new JwtValidate();
+                    if (!jwtValidate.validateToken(token))
+                    {
+                        return StatusCode(401, "Not Validated");
+                    }
+                }
+
+            }
+            
             if (employee.id == Guid.Empty)
             {
                 //No id is given in request body So it creates employee id, pushes employee with id and name to database 

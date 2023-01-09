@@ -1,7 +1,13 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using JWT.Algorithms;
+using JWT.Builder;
 
 namespace personal.Helpers
 {
@@ -34,6 +40,31 @@ namespace personal.Helpers
             {
                 return null;
             }
-        } 
+        }
+
+        public bool validateToken(string token)
+        {
+            try
+            {
+                X509Certificate2 certificate = new X509Certificate2("KeyCloakRealm.Public.crt");
+
+                RSACryptoServiceProvider key = (RSACryptoServiceProvider)certificate.PublicKey.Key;
+                RSAParameters rsaParameters = key.ExportParameters(false);
+
+                RSA rsa = RSA.Create();
+                rsa.ImportParameters(rsaParameters);
+
+                var json = JwtBuilder.Create()
+                         .WithAlgorithm(new RS256Algorithm(rsa)) // asymmetric
+                         .MustVerifySignature()
+                         .Decode(token);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
     }
 }
