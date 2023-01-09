@@ -24,7 +24,7 @@ using Org.OpenAPITools.Authentication;
 using Org.OpenAPITools.Filters;
 using Org.OpenAPITools.OpenApi;
 using Org.OpenAPITools.Formatters;
-using personal.Helpers;
+using Org.OpenAPITools.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Org.OpenAPITools.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -73,9 +73,17 @@ namespace Org.OpenAPITools
                         NamingStrategy = new CamelCaseNamingStrategy()
                     });
                 });
+
             services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>( options =>
             {
-                options.UseNpgsql(Configuration.GetConnectionString("WebApiDatabase"));
+                string DBName = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_DBNAME");
+                string Host = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_HOST");
+                string Port = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_PORT");
+                string User = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_USER");
+                string password = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_PASSWORD");
+              
+                string WebApiDatabase = $"Server={Host};Database={DBName};Port={Port};User Id={User};Password={password}";
+                options.UseNpgsql(WebApiDatabase);
             });
 
             services

@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using JWT.Algorithms;
 using JWT.Builder;
 
-namespace personal.Helpers
+namespace Org.OpenAPITools.Helpers
 {
     public  class JwtValidate
     {

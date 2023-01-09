@@ -29,7 +29,6 @@ namespace Org.OpenAPITools.Models
     public partial class Assignment : IEquatable<Assignment>
     {
 
-
         /// <summary>
         /// the id of the assignment
         /// </summary>
@@ -45,6 +44,10 @@ namespace Org.OpenAPITools.Models
         [DataMember(Name = "employee_id", EmitDefaultValue = false)]
         public Guid employee_id { get; set; }
 
+        //[Required]
+        //[DataMember(Name = "role", EmitDefaultValue = false)]
+        //public string role { get; set; }
+
         /// <summary>
         /// the id of the reservation this assignment references
         /// </summary>
@@ -54,33 +57,32 @@ namespace Org.OpenAPITools.Models
         public Guid reservation_id { get; set; }
 
 
-        [DataMember(Name = "role", EmitDefaultValue = false)]
-        public string role { get; set; }
 
-        /*
-         * 
-         * 
+
+
         /// <summary>
         /// the role which the employee impersonates in this assignment
         /// </summary>
         /// <value>the role which the employee impersonates in this assignment</value>
-        [TypeConverter(typeof(CustomEnumConverter<RoleEnum>))]
+        [TypeConverter(typeof(CustomEnumConverter<assignment_role>))]
         [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public enum RoleEnum
+        public enum assignment_role
         {
 
             /// <summary>
             /// Enum ServiceEnum for service
             /// </summary>
             [EnumMember(Value = "service")]
-            ServiceEnum = 1,
+            service,
 
             /// <summary>
             /// Enum CleanupEnum for cleanup
             /// </summary>
             [EnumMember(Value = "cleanup")]
-            CleanupEnum = 2
+            cleanup
         }
+
+ 
 
         /// <summary>
         /// the role which the employee impersonates in this assignment
@@ -88,10 +90,9 @@ namespace Org.OpenAPITools.Models
         /// <value>the role which the employee impersonates in this assignment</value>
         [Required]
         [DataMember(Name = "role", EmitDefaultValue = true)]
-        public RoleEnum role { get; set; }
+        public assignment_role role { get; set; }
 
 
-        */
 
         /// <summary>
         /// Returns the string presentation of the object
