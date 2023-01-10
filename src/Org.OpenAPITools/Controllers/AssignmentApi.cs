@@ -248,7 +248,7 @@ namespace Org.OpenAPITools.Controllers
             url = reservationsUri + assignment.reservation_id+"/";
             if (Helpers.ApiRequest.HTTPreq(url).Result)
             {
-                 var Response = HTTPAbfrage("http://localhost:8000/reservations/"+ assignment.reservation_id);
+                //reservierung gefunden
             }
             else { return StatusCode(422, "Reservation not found"); }
 
@@ -294,23 +294,4 @@ namespace Org.OpenAPITools.Controllers
         }
     }
 }
-
-        public async Task<string> HTTPAbfrage(string url)
-        {
-            // Erstellen Sie eine neue HttpClient-Instanz
-            var client = new HttpClient();
-
-
-            // Senden Sie eine GET-Anfrage an die angegebene URL
-            var response = await client.GetAsync(url);
-
-            // Warten Sie, bis die Antwort empfangen wurde
-            response.EnsureSuccessStatusCode(); // Wirft eine Ausnahme, wenn der Statuscode nicht in der 2xx-Range liegt
-
-
-            return responseBody;
-        }
-    }
-}
-
 
