@@ -4,6 +4,7 @@ EXPOSE 9000
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+RUN dir
 COPY ["/src/Org.OpenAPITools/personal.csproj", "personal/"]
 RUN dotnet restore "/src/Org.OpenAPITools/personal.csproj"
 COPY . .
