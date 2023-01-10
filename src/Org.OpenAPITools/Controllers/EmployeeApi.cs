@@ -27,6 +27,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 
 namespace Org.OpenAPITools.Controllers
 {
@@ -37,10 +38,12 @@ namespace Org.OpenAPITools.Controllers
     public class EmployeeApiController : ControllerBase
     {
         private readonly DatabaseContext databaseContext;
+        private readonly ILogger<EmployeeApiController> _logger;
 
-        public EmployeeApiController(DatabaseContext dbContext)
+        public EmployeeApiController(DatabaseContext dbContext, ILogger<EmployeeApiController> logger)
         {
             databaseContext = dbContext;
+            _logger = logger;
         }
 
         /// <summary>
@@ -54,6 +57,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(PersonalEmployeesGet200Response), description: "successful operation")]
         public virtual IActionResult PersonalEmployeesGet()
         {
+            _logger.LogInformation("GetRequest for all employees");
             var employees = databaseContext.employees;
             return new JsonResult(employees);
         }
@@ -76,6 +80,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "deletion not possible because of existing assignments")]
         public virtual IActionResult PersonalEmployeesIdDelete([FromRoute(Name = "id")][Required] Guid id)
         {
+            _logger.LogInformation("DeleteRequest for employee: {employeeId}", id);
             var employee = databaseContext.employees.Find(id);
             if (employee != null)
             {
@@ -84,15 +89,18 @@ namespace Org.OpenAPITools.Controllers
                     if (assignement.employee_id == employee.id)
                     {
                         //hat noch assignements
+                        _logger.LogInformation("422: deletion not possible because of existing assignments for employee: {employeeId}", id);
                         return StatusCode(422, "deletion not possible because of existing assignments");
                     }
                 }
                 databaseContext.Remove(employee);
                 databaseContext.SaveChanges();
+                _logger.LogInformation("204: successful delete operation for employee: {employeeId}", id);
                 return StatusCode(204, "successful operation");
             }
             else
             {
+                _logger.LogInformation("404: not found employee: {employeeId}", id);
                 return StatusCode(404);
             }
         }
@@ -111,12 +119,19 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
         public virtual IActionResult PersonalEmployeesIdGet([FromRoute(Name = "id")][Required] Guid id)
         {
+            _logger.LogInformation("GetRequest for employee: {employeeId}", id);
             var employee = databaseContext.employees.Find(id);
-            if (employee!= null)
+            if (employee != null)
             {
+                _logger.LogInformation("200: successful get operation for employee: {employeeId}", id);
                 return StatusCode(200, new JsonResult(employee));
             }
-            else return StatusCode(404, default(Error));
+            else
+            {
+                _logger.LogInformation("404: not found employee: {employeeId}", id);
+                return StatusCode(404, default(Error));
+            }
+
         }
 
         /// <summary>
@@ -140,7 +155,12 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "mismatching id in url and object")]
         public virtual IActionResult PersonalEmployeesIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Employee employee)
         {
-            if (employee.id == Guid.Empty) { return StatusCode(422); }
+            _logger.LogInformation("UpdateRequest for employee: {employeeId}", id);
+            if (employee.id == Guid.Empty)
+            {
+                _logger.LogInformation("422: mismatching id in url and object for employee: {employeeId}", id);
+                return StatusCode(422); 
+            }
             if (employee.id == id)
             {
                 var exis_empl = databaseContext.employees.Find(employee.id);
@@ -154,9 +174,14 @@ namespace Org.OpenAPITools.Controllers
                     databaseContext.employees.Add(employee);
                 }
                 databaseContext.SaveChanges();
+                _logger.LogInformation("204: updated for employee: {employeeId}", id);
                 return StatusCode(204);
             }
-            else return StatusCode(422, "Mismatch in ID and Object");
+            else
+            {
+                _logger.LogInformation("422: mismatching id in url and object for employee: {employeeId}", id);
+                return StatusCode(422, "Mismatch in ID and Object");
+            }
         }
 
         /// <summary>
@@ -180,6 +205,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(Error), description: "if no (valid) authentication is given")]
         public virtual IActionResult PersonalEmployeesPost([FromBody] Employee employee)
         {
+            _logger.LogInformation("PostRequest for employee: {employeeId}", employee.id);
             // Der 400 Statuscode wird automatisch beim umwandeln in ein GUID ausgelöst 
             if (employee.id == Guid.Empty)
             {
@@ -187,6 +213,7 @@ namespace Org.OpenAPITools.Controllers
                 employee.id = Guid.NewGuid();
                 databaseContext.employees.Add(employee);
                 databaseContext.SaveChanges();
+                _logger.LogInformation("201: created new employee");
                 return StatusCode(201);
             }
             else
@@ -197,12 +224,14 @@ namespace Org.OpenAPITools.Controllers
                     exis_empl.name = employee.name;
                     databaseContext.Update(exis_empl);
                     databaseContext.SaveChanges();
+                    _logger.LogInformation("200: updated employee: {employeeId}", employee.id);
                     return StatusCode(200);
                 }
                 else //id ist unbekannt oder wurde nicht gefunden CREATE
                 {
                     databaseContext.employees.Add(employee);
                     databaseContext.SaveChanges();
+                    _logger.LogInformation("201: created new employee: {employeeId}", employee.id);
                     return StatusCode(201);
                 }
             }

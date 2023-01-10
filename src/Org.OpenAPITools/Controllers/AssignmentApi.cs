@@ -28,6 +28,7 @@ using System.Linq;
 using static Org.OpenAPITools.Models.Assignment;
 using Npgsql;
 using System.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Org.OpenAPITools.Controllers
 {
@@ -38,10 +39,12 @@ namespace Org.OpenAPITools.Controllers
     public class AssignmentApiController : ControllerBase
     {
         private readonly DatabaseContext databaseContext;
+        private readonly ILogger<AssignmentApiController> _logger;
 
-        public AssignmentApiController(DatabaseContext dbContext)
+        public AssignmentApiController(DatabaseContext dbContext, ILogger<AssignmentApiController> logger)
         {
             databaseContext = dbContext;
+            _logger = logger;
         }
         /// <summary>
         /// get all personal assignments
@@ -58,12 +61,14 @@ namespace Org.OpenAPITools.Controllers
             if (employeeId == null)
             {
                 var assignments = databaseContext.assignments;
+                _logger.LogInformation("GetRequest for assignments");
                 return new JsonResult(assignments);
             }
             else
             {
                 List<Assignment> matchingempl = databaseContext.assignments.Where(a => a.employee_id == employeeId)
                     .ToList();
+                _logger.LogInformation("GetRequest for assignments with employeeId: {employeeId}", employeeId);
                 return new JsonResult(matchingempl);
             }
         }
@@ -84,15 +89,18 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
         public virtual IActionResult PersonalAssignmentsIdDelete([FromRoute(Name = "id")][Required] Guid id)
         {
+            _logger.LogInformation("GetRequest for assignments with employeeId: {employeeId}", employeeId);
             var assignment = databaseContext.assignments.Find(id);
             if (assignment != null)
             {
                 databaseContext.Remove(assignment);
                 databaseContext.SaveChanges();
+                _logger.LogInformation("204: deleted assignment: {assignmentId}", id);
                 return StatusCode(204);
             }
             else
             {
+                _logger.LogInformation("404: not found assignment: {assignmentId}", id);
                 return StatusCode(404);
             }
         }
@@ -111,12 +119,18 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
         public virtual IActionResult PersonalAssignmentsIdGet([FromRoute(Name = "id")][Required] Guid id)
         {
+            _logger.LogInformation("GetRequest for assignment: {assignmentId}", id);
             var assignment = databaseContext.assignments.Find(id);
-            if (assignment!= null)
+            if (assignment != null)
             {
+                _logger.LogInformation("200: successfull operation for assignment: {assignmentId}", id);
                 return StatusCode(200, new JsonResult(assignment));
             }
-            else return StatusCode(404, default(Error));
+            else
+            {
+                _logger.LogInformation("404: not found assignment: {assignmentId}", id);
+                return StatusCode(404, default(Error));
+            }
         }
 
         /// <summary>
@@ -140,11 +154,13 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist or mismatching id in url and object ")]
         public virtual IActionResult PersonalAssignmentsIdPut([FromRoute(Name = "id")][Required] Guid id, [FromBody] Assignment assignment)
         {
+            _logger.LogInformation("PutRequest for assignment: {assignmentId}", id);
             if (assignment.id == id)
             {
-                if ((assignment.role!=Assignment.assignment_role.cleanup) &(assignment.role !=Assignment.assignment_role.service))
+                if ((assignment.role != Assignment.assignment_role.cleanup) & (assignment.role != Assignment.assignment_role.service))
                 {
                     //keine richtige rolle
+                    _logger.LogInformation("422: NO valid Role for assignment: {assignmentId}", id);
                     return StatusCode(422, "NO valid Role");
                 }
 
@@ -154,15 +170,24 @@ namespace Org.OpenAPITools.Controllers
                 {
                     //Employee gefunden
                 }
-                else { return StatusCode(422, "Employee not found"); }
+                else
+                {
+                    _logger.LogInformation("422: Employee not found for assignment: {assignmentId}", id);
+                    return StatusCode(422, "Employee not found");
+                }
 
                 string reservationsUri = Environment.GetEnvironmentVariable("PERSONAL_RESERVATIONS_URI") ?? "http://localhost/api/reservations/";
-                url = reservationsUri + assignment.reservation_id+"/";
+                url = reservationsUri + assignment.reservation_id + "/";
                 if (Helpers.ApiRequest.HTTPreq(url).Result)
                 {
                     //reservation gefunden
                 }
-                else { return StatusCode(422, "Reservation not found"); }
+                else
+                {
+
+                    _logger.LogInformation("422: Reservation not found for assignment: {assignmentId}", id);
+                    return StatusCode(422, "Reservation not found");
+                }
 
 
                 // reservation hat assignment mit gleicher role?
@@ -175,6 +200,7 @@ namespace Org.OpenAPITools.Controllers
                     {
                         if (existingAssignmentReservation.role == assignment.role)
                         {
+                            _logger.LogInformation("422: Reservation already has assignement with same role for assignment: {assignmentId}", id);
                             return StatusCode(422, "Reservation already has assignement with same role");
                         }
                     }
@@ -197,16 +223,23 @@ namespace Org.OpenAPITools.Controllers
                     exis_ass.role = assignment.role;
                     databaseContext.Update(exis_ass);
                     databaseContext.SaveChanges();
+                    _logger.LogInformation("204: Update assignment: {assignmentId}", id);
                     return StatusCode(204);
                 }
                 else //id ist unbekannt oder wurde nicht gefunden CREATE
                 {
                     databaseContext.assignments.Add(assignment);
                     databaseContext.SaveChanges();
+                    _logger.LogInformation("204: Create assignment: {assignmentId}", id);
                     return StatusCode(204);
                 }
             }
-            else return StatusCode(422, "Mismatch in ID and Object");
+            else
+            {
+                _logger.LogInformation("422: Mismatch in ID and Object for assignment: {assignmentId}", id);
+                return StatusCode(422, "Mismatch in ID and Object"); 
+            }
+
         }
 
 
@@ -233,9 +266,12 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 422, type: typeof(Error), description: "if the reservation already has an assignment with the given role or the employee does not exist or the reservation does not exist ")]
         public virtual IActionResult PersonalAssignmentsPost([FromBody] Assignment assignment)
         {
+            _logger.LogInformation("PostRequest for assignment: {assignmentId}", assignment.id);
+
             if ((assignment.role!=Assignment.assignment_role.cleanup) &(assignment.role !=Assignment.assignment_role.service))
             {
                 //keine richtige rolle
+                _logger.LogInformation("422: NO valid Role for assignment: {assignmentId}", assignment.id);
                 return StatusCode(422, "NO valid Role");
             }
 
@@ -245,7 +281,11 @@ namespace Org.OpenAPITools.Controllers
             {
                 //Employee gefunden
             }
-            else { return StatusCode(422, "Employee not found"); }
+            else 
+            {
+                _logger.LogInformation("422: Employee not found for assignment: {assignmentId}", assignment.id);
+                return StatusCode(422, "Employee not found"); 
+            }
 
             string reservationsUri = Environment.GetEnvironmentVariable("PERSONAL_RESERVATIONS_URI") ?? "http://localhost/api/reservations/";
             url = reservationsUri + assignment.reservation_id+"/";
@@ -253,7 +293,11 @@ namespace Org.OpenAPITools.Controllers
             {
                 //reservierung gefunden
             }
-            else { return StatusCode(422, "Reservation not found"); }
+            else 
+            {
+                _logger.LogInformation("422: Reservation not found for assignment: {assignmentId}", assignment.id); 
+                return StatusCode(422, "Reservation not found"); 
+            }
 
             //reservation hat assignment mit gleicher role?
             List<Assignment> existingAssignmentReservations = databaseContext.assignments.Where(a => a.reservation_id == assignment.reservation_id)
@@ -265,6 +309,7 @@ namespace Org.OpenAPITools.Controllers
                 {
                     if (existingAssignmentReservation.role == assignment.role)
                     {
+                        _logger.LogInformation("422: Reservation already has assignement with same role for assignment: {assignmentId}", assignment.id);
                         return StatusCode(422, "Reservation already has assignement with same role");
                     }
                 }
@@ -286,13 +331,16 @@ namespace Org.OpenAPITools.Controllers
                 exis_ass.role = assignment.role;
                 databaseContext.Update(exis_ass);
                 databaseContext.SaveChanges();
+                _logger.LogInformation("200: Update assignment: {assignmentId}", assignment.id);
                 return StatusCode(200);
             }
             else //id ist unbekannt oder wurde nicht gefunden CREATE
             {
                 databaseContext.assignments.Add(assignment);
                 databaseContext.SaveChanges();
+                _logger.LogInformation("201: Create assignment: {assignmentId}", assignment.id);
                 return StatusCode(201);
+                
             }
         }
     }
