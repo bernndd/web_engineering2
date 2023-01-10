@@ -74,14 +74,14 @@ namespace Org.OpenAPITools
                     });
                 });
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>( options =>
+            services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(options =>
             {
                 string DBName = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_DBNAME");
                 string Host = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_HOST");
                 string Port = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_PORT");
                 string User = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_USER");
                 string password = Environment.GetEnvironmentVariable("POSTGRES_PERSONAL_PASSWORD");
-              
+
                 string WebApiDatabase = $"Server={Host};Database={DBName};Port={Port};User Id={User};Password={password}";
                 options.UseNpgsql(WebApiDatabase);
             });
@@ -129,13 +129,21 @@ namespace Org.OpenAPITools
                                        .SetMinimumLevel(LogLevel.Information)
                                );
 
+            string realm = Environment.GetEnvironmentVariable("KEYCLOAK_REALM") ?? "biletado";
+            string host = Environment.GetEnvironmentVariable("KEYCLOAK_HOST") ?? "localhost";
+            string issuer = "localhost";
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-                    {
-                        Configuration.Bind("JwtSettings", options);
-                        options.Events = AuthEventsHandler.Instance;
-                    });
+            services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+                            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
+                            {
+                                o.MetadataAddress = $"http://{host}/auth/realms/{realm}/.well-known/openid-configuration";
+                                o.Authority = $"http://{host}/realms/{realm}";
+                                o.TokenValidationParameters.ValidIssuer = $"http://{issuer}/auth/realms/{realm}";
+                                o.TokenValidationParameters.ClockSkew = TimeSpan.Zero; // setting this to zero reduces the time tokens are seen valid after their expiration
+                                o.Audience = "account";
+                                o.RequireHttpsMetadata = false;
+
+                            });
 
         }
 
@@ -174,6 +182,7 @@ namespace Org.OpenAPITools
                     // c.SwaggerEndpoint("/openapi-original.json", "Biletado services Original");
                 });
             app.UseRouting();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
