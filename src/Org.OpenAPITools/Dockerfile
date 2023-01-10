@@ -1,16 +1,19 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
-WORKDIR /personal
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 9000
 
-# Copy everything
-COPY . ./
-# Restore as distinct layers
-RUN dotnet restore
-# Build and publish a release
-RUN dotnet publish -c Release -o out
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["Org.OpenAPITools/personal.csproj", "personal/"]
+RUN dotnet restore "Org.OpenAPITools/personal.csproj"
+COPY . .
+WORKDIR "/src/Org.OpenAPITools"
+RUN dotnet build "personal.csproj" -c Release -o /app/build
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
-WORKDIR /personal
-COPY --from=build-env /personal/out .
-RUN ls
+FROM build AS publish
+RUN dotnet publish "personal.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "personal.dll"]
