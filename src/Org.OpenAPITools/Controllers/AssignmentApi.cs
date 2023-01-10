@@ -89,7 +89,7 @@ namespace Org.OpenAPITools.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(Error), description: "not found")]
         public virtual IActionResult PersonalAssignmentsIdDelete([FromRoute(Name = "id")][Required] Guid id)
         {
-            _logger.LogInformation("GetRequest for assignments with employeeId: {employeeId}", employeeId);
+            _logger.LogInformation("GetRequest for assignments with employeeId: {employeeId}", id);
             var assignment = databaseContext.assignments.Find(id);
             if (assignment != null)
             {

@@ -7,7 +7,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <Version>1.0.0</Version>
-    <AssemblyName>Org.OpenAPITools</AssemblyName>
+    <AssemblyName>personal</AssemblyName>
     <PackageId>Org.OpenAPITools</PackageId>
     <UserSecretsId>3ef45709-21ce-4dcd-b3a3-50c1ad0846de</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>

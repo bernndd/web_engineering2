@@ -6,15 +6,15 @@
       "launchUrl": "openapi",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "KEYCLOAK_HOST": "traefik",
-        "KEYCLOAK_REALM": " biletado",
+        "KEYCLOAK_HOST": "localhost",
+        "KEYCLOAK_REALM": "biletado",
         "JAEGER_TRACECONTEXTHEADERNAME": "Uber-Trace-Id",
         "POSTGRES_PERSONAL_USER": "postgres",
         "POSTGRES_PERSONAL_PASSWORD": "postgres",
         "POSTGRES_PERSONAL_DBNAME": "personal",
-        "POSTGRES_PERSONAL_HOST": "postgres",
+        "POSTGRES_PERSONAL_HOST": "localhost",
         "POSTGRES_PERSONAL_PORT": "5432",
-        "PERSONAL_EMPLOYEE_URI": "http://traefik/api/personal/employees/",
+        "PERSONAL_EMPLOYEE_URI": "http://localhost:9000/personal/employees/",
         "PERSONAL_RESERVATIONS_URI": "http://traefik/api/reservations/"
       }
     },
@@ -23,7 +23,17 @@
       "launchBrowser": true,
       "launchUrl": "openapi",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "KEYCLOAK_HOST": "traefik",
+        "KEYCLOAK_REALM": "biletado",
+        "JAEGER_TRACECONTEXTHEADERNAME": "Uber-Trace-Id",
+        "POSTGRES_PERSONAL_USER": "postgres",
+        "POSTGRES_PERSONAL_PASSWORD": "postgres",
+        "POSTGRES_PERSONAL_DBNAME": "personal",
+        "POSTGRES_PERSONAL_HOST": "postgres",
+        "POSTGRES_PERSONAL_PORT": "5432",
+        "PERSONAL_EMPLOYEE_URI": "http://traefik/api/personal/employees/",
+        "PERSONAL_RESERVATIONS_URI": "http://traefik/api/reservations/"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
