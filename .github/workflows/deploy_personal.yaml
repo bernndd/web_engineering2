@@ -12,10 +12,10 @@ on:
       
 jobs:
   deploy-docker-personal:
+    runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
-    runs-on: ubuntu-latest
 
     steps:
         - uses: actions/checkout@v2
@@ -41,7 +41,7 @@ jobs:
           with:
             registry: ${{ env.REGISTRY }}
             username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
+            password: ${{ secrets.TOKEN }}
 
         - name: Build and push
           uses: docker/build-push-action@v3.2.0
