@@ -1,5 +1,6 @@
 name: Deploy Personal_Backend
 
+
 on:
   release:
     types: [published]
@@ -8,6 +9,9 @@ on:
       
 jobs:
   deploy-docker-personal:
+    permissions:
+      packages: write
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
