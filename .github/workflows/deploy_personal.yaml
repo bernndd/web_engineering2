@@ -1,0 +1,26 @@
+name: Deploy Personal_Backend
+
+on:
+  push:
+    branches:
+      -master
+      
+jobs:
+  steps:
+    - name: Login to image repository
+        if: github.ref_type == 'tag'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+    - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./src/Org.OpenAPITools/Dockerfile
+          push: ${{ github.ref_type == 'tag' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  
