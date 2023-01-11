@@ -1,5 +1,8 @@
 name: Deploy Personal_Backend
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 on:
   release:
@@ -21,7 +24,7 @@ jobs:
           id: meta
           uses: docker/metadata-action@v4
           with:
-            images: ghcr.io/bernndd/web_engineering2
+            images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             flavor: latest=true
             tags: |
               type=ref,event=branch
@@ -31,12 +34,12 @@ jobs:
         - name: Login to image repository
           uses: docker/login-action@v2
           with:
-            registry: ghcr.io
+            registry: ${{ env.REGISTRY }}
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Build and push
-          uses: docker/build-push-action@v3
+          uses: docker/build-push-action@v3.2.0
           with:
             context: .
             file: ./src/Org.OpenAPITools/Dockerfile
