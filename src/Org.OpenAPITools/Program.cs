@@ -27,7 +27,7 @@ namespace Org.OpenAPITools
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                    webBuilder.UseStartup<Startup>()
-                             .UseUrls("http://0.0.0.0:8000/");
+                             .UseUrls("http://0.0.0.0:9000/");
                 });
     }
 

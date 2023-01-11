@@ -142,7 +142,6 @@ namespace Org.OpenAPITools
                                 o.TokenValidationParameters.ClockSkew = TimeSpan.Zero; // setting this to zero reduces the time tokens are seen valid after their expiration
                                 o.Audience = "account";
                                 o.RequireHttpsMetadata = false;
-
                             });
 
         }
@@ -162,7 +161,7 @@ namespace Org.OpenAPITools
             {
                 app.UseHsts();
             }
-
+            app.UseAuthentication();
 
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
