@@ -41,12 +41,12 @@ jobs:
           with:
             registry: ${{ env.REGISTRY }}
             username: ${{ github.actor }}
-            password: ${{ secrets.TOKEN }}
+            password: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Build and push
           uses: docker/build-push-action@v3.2.0
           with:
-            context: .
+            context: ./src/Org.OpenAPITools/
             file: ./src/Org.OpenAPITools/Dockerfile
             push: ${{ github.ref_type != 'pull_request' }}
             tags: ${{ steps.meta.outputs.tags }}
