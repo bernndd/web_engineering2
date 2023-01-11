@@ -17,7 +17,7 @@ jobs:
           id: meta
           uses: docker/metadata-action@v4
           with:
-            images: ghcr.io/bernndd/WebEngineering2
+            images: ghcr.io/bernndd/web_engineering2
             flavor: latest=true
             tags: |
               type=ref,event=branch
