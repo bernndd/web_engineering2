@@ -62,7 +62,7 @@ jobs:
           uses: docker/build-push-action@v3.2.0
           with:
             context: ./personal/
-            file: .personal/Dockerfile
+            file: ./personal/Dockerfile
             push: ${{ github.ref_type != 'pull_request' }}
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
