@@ -1,4 +1,4 @@
-name: Deploy Personal_Backend
+nname: Deploy Personal_Backend
 
 
 env:
@@ -61,8 +61,8 @@ jobs:
         - name: Build and push
           uses: docker/build-push-action@v3.2.0
           with:
-            context: ./src/Org.OpenAPITools/
-            file: ./src/Org.OpenAPITools/Dockerfile
+            context: ./personal/
+            file: .personal/Dockerfile
             push: ${{ github.ref_type != 'pull_request' }}
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
