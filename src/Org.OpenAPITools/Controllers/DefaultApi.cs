@@ -45,7 +45,7 @@ namespace Org.OpenAPITools.Controllers
             //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(200, default(PersonalStatusGet200Response));
             string exampleJson = null;
-            exampleJson = "{\n  \"authors\" : [ \"Simon Stenzel\", \"Stefan Graﬂold\", \"Bernd Dorer\" ]\n}";
+            exampleJson = "{\n  \"authors\" : [ \"Simon Stenzel\", \"Stefan Grassold\", \"Bernd Dorer\" ]\n}";
             
             var example = exampleJson != null
             ? JsonConvert.DeserializeObject<PersonalStatusGet200Response>(exampleJson)
