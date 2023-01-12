@@ -164,4 +164,4 @@ services:
       OAUTH_CLIENT_ID: angular
     volumes:
       - ./apidocs/global-config.yaml:/tmp/global-config.yaml:Z
-      - ./apidocs/docker-entrypoint.d/40-merge-global-config.sh:/tmp/docker-entrypoint.d/40-merge-global-config.sh:Z
+      - ./apidocs/docker-entrypoint.d/40-merge-global-config.sh:/docker-entrypoint.d/40-merge-global-config.sh:Z
